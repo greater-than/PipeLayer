@@ -1,18 +1,21 @@
 -r src/steampipe/requirements.txt
--r src/examples/flask_microservice/requirements.txt
+-r examples/steampipe_microservice/requirements.txt
 
 autopep8
-pytest
-pytest-cov
-coverage[toml]
-pytest-mock
-autopep8
 isort
-pre-commit
-setuptools
-typing
-wheel
-poetry
 flake8
 flake8-quotes
+
+typing
 mypy
+
+pytest
+pytest-cov
+pytest-mock
+pytest-nunit
+coverage[toml]
+
+pre-commit
+setuptools
+wheel
+poetry

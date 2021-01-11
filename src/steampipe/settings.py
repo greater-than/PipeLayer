@@ -1,2 +1,5 @@
-class Settings:
+from pydantic import BaseModel
+
+
+class Settings(BaseModel):
     ...

@@ -1,0 +1,3 @@
+pydantic
+structlog
+structlog[colorama]

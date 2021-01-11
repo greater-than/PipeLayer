@@ -1,4 +1,4 @@
-# SteamPipe
+# SteamPipe Documentation
 Steampipe is a light-weight pipeline framework. Define a series of steps, and chain them together to create plug-and-play applications.
 
 ## Table of Contents
@@ -22,7 +22,7 @@ pip install steampipe
 To create a pipeline:
 
 ```
-from steampipe import Context, Pipeline
+from steampipe.context import Context, Pipeline
 
 my_context = Context
 
@@ -30,10 +30,13 @@ my_pipeline = Pipeline()
 ```
 
 ### The Pipeline Context
-A Context object is used to pass application-level information to each step. The Context class contains two properties `settings` and `log`.
+The Context object is used to pass application-level information to each step. The Context class contains two abstract properties `settings` and `log`.
 
-* `settings` is where you can store key-value pairs that the application uses.
+* `settings` is where you can store application-level data.
 * `log` is a logger, by default it uses the built-in Python Logger
+* `manifest` is an ordered dictionary that keeps a record of start/stop times for a pipeline, as well as each step.
+
+
 
 ### Steps
 Create a class that inherits from `steampipe.Step` abstract class, and implements the execute method.

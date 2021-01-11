@@ -1,18 +1,24 @@
-from abc import ABC
-from logging import Logger
-
-from steampipe.settings import Settings
+from abc import ABC, abstractmethod
+from typing import Any
 
 
 class Context(ABC):
-    def __init__(self, settings: Settings, log: Logger):
-        self.__settings = settings
-        self.__log = log
+    """
+    A extensible container with abstract properties for settings and a logger.
+    """
 
     @property
-    def settings(self) -> Settings:
-        return self.__settings
+    @abstractmethod
+    def settings(self) -> Any:
+        """
+        A container for application level settings
+        """
+        raise NotImplementedError
 
     @property
-    def log(self) -> Logger:
-        return self.__log
+    @abstractmethod
+    def log(self) -> Any:
+        """
+        Any type of Logger
+        """
+        raise NotImplementedError

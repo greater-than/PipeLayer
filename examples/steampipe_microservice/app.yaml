@@ -1,0 +1,53 @@
+openapi: 3.0.3
+
+info:
+  title: greaterThan SteamPipe MicroService Example
+  description: SteamPipe Service API
+  version: /v1.0.0
+
+servers:
+  - url: /v1
+
+paths:
+  /hello_world:
+    get:
+      operation_id: steampipe_microservice.api.hello_world
+      responses:
+        200:
+          description: Hello World
+      summary: Hello World
+      tags:
+        - Hello World
+
+tags:
+  - name: SteamPipe
+    description: SteamPipe
+
+components:
+  schemas:
+    # ERROR SCHEMAS
+    500-Error:
+      properties:
+        detail:
+          example: Houston we have a problem
+          type: string
+        status:
+          example: 500
+          type: string
+        title:
+          example: Server Error
+          type: string
+      type: object
+
+    400-Error:
+      properties:
+        detail:
+          example: Bad Request
+          type: string
+        status:
+          example: 400
+          type: string
+        title:
+          example: Bad Request
+          type: string
+      type: object

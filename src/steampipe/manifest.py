@@ -1,7 +1,24 @@
-from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Optional
+
+from pydantic import BaseModel
 
 
-class Manifest(OrderedDict):
-    def add_entry(self, message: str) -> None:
-        self.update({datetime.now(): message})
+class ManifestEntry(BaseModel):
+    name: str
+    start: Optional[datetime]
+    end: Optional[datetime]
+    duration: Optional[timedelta]
+
+
+class ManifestEntryList(list):
+    ...
+
+
+class ManifestStep(ManifestEntry):
+    pre_process: Optional[ManifestEntry]
+    post_process: Optional[ManifestEntry]
+
+
+class Manifest(ManifestEntry):
+    steps: ManifestEntryList = ManifestEntryList()

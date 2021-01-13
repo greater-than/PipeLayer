@@ -8,7 +8,7 @@ from steampipe.context import Context
 
 class Step(ABC):
     def __init__(self: Step, name: str = "", pre_process: Callable = None, post_process: Callable = None):
-        self.__name = name or __name__
+        self.__name = name or self.__class__.__name__
         self.__pre_process = pre_process
         self.__post_process = post_process
 

@@ -1,6 +1,6 @@
 from logging import Logger
 
-from app.config.app_settings import AppSettings
+from app_settings import AppSettings
 from steampipe.context import Context
 
 

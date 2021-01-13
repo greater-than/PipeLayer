@@ -1,5 +1,6 @@
--r src/steampipe/requirements.txt
+-r src/requirements.txt
 -r examples/steampipe_microservice/requirements.txt
+-r examples/simple_pipeline/requirements.txt
 
 autopep8
 isort
@@ -15,7 +16,7 @@ pytest-mock
 pytest-nunit
 coverage[toml]
 
+# poetry
 pre-commit
 setuptools
 wheel
-poetry

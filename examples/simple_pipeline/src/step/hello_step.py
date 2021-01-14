@@ -1,7 +1,8 @@
-from steampipe.step import Step
+from app_context import AppContext
+from steampipe import Step
 
 
 class HelloStep(Step):
 
-    def execute(self, context, data) -> str:
+    def run(self, context: AppContext, data: str = None) -> str:
         return "Hello"

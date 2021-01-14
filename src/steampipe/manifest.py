@@ -28,4 +28,7 @@ class ManifestStep(ManifestEntry):
 
 
 class Manifest(ManifestEntry):
+    """
+    A running log of pipeline activity
+    """
     steps: ManifestEntryList = ManifestEntryList()

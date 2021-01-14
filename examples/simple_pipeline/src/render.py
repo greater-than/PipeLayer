@@ -1,13 +1,15 @@
-import json
 from typing import Any
 
+from steampipe import Manifest
+from steampipe.util import render_manifest
 
-def print_manifest(manifest: str) -> None:
+
+def print_manifest(manifest: Manifest) -> None:
     print("")
     print("==================")
     print("Pipeline Manifest:")
     print("------------------")
-    print(json.dumps(json.loads(manifest), indent=2))
+    print(render_manifest(manifest))
     print("")
 
 

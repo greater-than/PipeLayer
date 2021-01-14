@@ -25,5 +25,5 @@ class Step(ABC):
         return self.__post_process
 
     @abstractmethod
-    def execute(self, context: Context, data: Any = None) -> Any:
+    def run(self, context: Context, data: Any) -> Any:
         raise NotImplementedError

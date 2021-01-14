@@ -7,7 +7,7 @@ import _path_patch  # noqa F401
 from app_context import AppContext
 from app_settings import AppSettings
 from render import print_manifest
-from steampipe.pipeline import Pipeline
+from steampipe import Pipeline
 from step.hello_step import HelloStep
 from step.world_step import WorldStep
 
@@ -23,7 +23,7 @@ def main() -> None:
     ]
     output = pipeline.run(steps, None)
 
-    print_manifest(pipeline.manifest.json())
+    print_manifest(pipeline.manifest)
 
     return output
 

@@ -1,7 +1,7 @@
 from logging import Logger
 
 from app_settings import AppSettings
-from steampipe.context import Context
+from steampipe import Context
 
 
 class AppContext(Context):

@@ -1,4 +1,4 @@
-from steampipe.settings import Settings
+from steampipe import Settings
 
 
 class AppSettings(Settings):

@@ -1,8 +1,7 @@
 import json
 
 import pytest
-from steampipe.pipeline import Pipeline
-from steampipe.step import Step
+from steampipe import Pipeline, Step
 
 
 @pytest.mark.integration
@@ -16,7 +15,7 @@ class TestPipeline:
             return data
 
         class FirstStep(Step):
-            def execute(self, context: AppContext, data=None) -> dict:
+            def run(self, context: AppContext, data=None) -> dict:
                 return {"something": "goes here"}
 
         steps = [

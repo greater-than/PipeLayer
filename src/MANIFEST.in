@@ -1,0 +1,8 @@
+# Manifest syntax https://docs.python.org/2/distutils/sourcedist.html
+graft steampipe
+
+include README.*
+include LICENSE
+include PKG-INFO
+
+include requirements*.*

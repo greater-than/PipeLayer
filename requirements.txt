@@ -1,0 +1,22 @@
+-r src/requirements.txt
+-r examples/steampipe_microservice/requirements.txt
+-r examples/simple_pipeline/requirements.txt
+
+autopep8
+isort
+flake8
+flake8-quotes
+
+typing
+mypy
+
+pytest
+pytest-cov
+pytest-mock
+pytest-nunit
+coverage[toml]
+
+# poetry
+pre-commit
+setuptools
+wheel

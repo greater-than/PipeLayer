@@ -1,5 +1,5 @@
 # SteamPipe Documentation
-Steampipe is a lightweight pipeline framework. Define a series of reusable steps, and chain them together to create modular applications.
+Steampipe is a lightweight pipeline framework. Define a series of anonymous steps, and chain them together to create modular applications.
 
 ### Table of Contents
 
@@ -29,7 +29,7 @@ class AppSettings(Settings):
     """
     Complete this by adding constants, key/value data from AWS Parameter Store, etc
 
-    NOTE: The Settings class inherits from pydantic.BaseModel, so fields must be typed appropriately
+    The steampipe.Settings class inherits from pydantic.BaseModel, so fields must be typed appropriately
     """
     ...
 ```
@@ -197,3 +197,4 @@ The type of the `data` argument in the abstract class is `Any`, but you can use 
 ___
 
 ## Testing
+TODO: Come up with some testing scenarios, usage of the test_util.MockStep

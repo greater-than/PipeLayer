@@ -1,19 +1,33 @@
 from logging import Logger
 
+# =========================================================================
+# Remove this patch if running the example outside of the steampipe project
+import _path_patch  # noqa F401
+# -------------------------------------------------------------------------
 from app_context import AppContext
 from app_settings import AppSettings
+from render import print_manifest
 from steampipe.pipeline import Pipeline
 from step.hello_step import HelloStep
 from step.world_step import WorldStep
 
-app_settings = AppSettings()
-app_context = AppContext(app_settings, Logger("Logger"))
-hello_world_pipeline = Pipeline.create(app_context, "Hello World Pipeline")
 
-output = hello_world_pipeline.run([
-    HelloStep(),
-    WorldStep()
-])
+def main() -> None:
+    app_settings = AppSettings()
 
-print(f"Pipeline Output: {output}")
-print(hello_world_pipeline.manifest.__dict__)
+    context = AppContext(app_settings, Logger("Logger"))
+    pipeline = Pipeline.create(context, "Hello World Pipeline")
+    steps = [
+        HelloStep(),
+        WorldStep()
+    ]
+    output = pipeline.run(steps, None)
+
+    print_manifest(pipeline.manifest.json())
+
+    return output
+
+
+if __name__ == "__main__":
+    from render import print_output
+    print_output(main())

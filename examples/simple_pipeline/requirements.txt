@@ -1,1 +1,2 @@
+# Uncomment this requirement if running the app outside of the steampipe project
 # steampipe~=0.1.0

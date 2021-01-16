@@ -2,7 +2,6 @@ import json
 import os
 import subprocess
 
-from package import Package
 from setuptools import find_packages, setup
 
 current_dir = os.path.dirname(__file__)
@@ -29,7 +28,7 @@ def get_long_description() -> str:
 
 
 def get_requirements() -> list:
-    file_path = os.path.normpath(os.path.join(current_dir, "requirements.txt"))
+    file_path = os.path.normpath(os.path.join(current_dir + "/src", "requirements.txt"))
     requirements = []
     if os.path.isfile(file_path):
         with open(file_path, "r") as stream:
@@ -52,11 +51,11 @@ setup_args = {
     ],
     "author": "greaterThan, LLC",
     "author_email": "info@greaterthan.solutions",
-    "packages": find_packages(exclude=("test*")),
+    "packages": find_packages("src"),
+    "package_dir": {"": "src"},
     "include_package_data": True,
     "install_requires": get_requirements(),
-    "python_requires": ">=3.7",
-    "cmdclass": {"Package": Package}
+    "python_requires": ">=3.7"
 }
 
 

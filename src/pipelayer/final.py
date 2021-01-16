@@ -7,7 +7,7 @@ T = TypeVar("T", bound="Final")
 
 class Final(type):
     """
-    Prevents inheritance of any class that set the __metaclass__ property to Final
+    Prevents inheritance of any class that sets the __metaclass__ property to Final
     """
     def __new__(cls: Type[T], name: str, bases: Tuple[type, ...], classdict: dict) -> Final:
         for b in bases:

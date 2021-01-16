@@ -1,2 +1,2 @@
-# Uncomment this requirement if running the app outside of the pipelayer project
+# Uncomment the next line if running the app outside of the this project
 # pipelayer~=0.1.0

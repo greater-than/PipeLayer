@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Union
+from typing import Any, Callable, Optional
 
 from pipelayer.context import Context
 
@@ -17,11 +17,11 @@ class Filter(ABC):
         return self.__name
 
     @property
-    def pre_process(self) -> Union[Callable, None]:
+    def pre_process(self) -> Optional[Callable]:
         return self.__pre_process
 
     @property
-    def post_process(self) -> Union[Callable, None]:
+    def post_process(self) -> Optional[Callable]:
         return self.__post_process
 
     @abstractmethod

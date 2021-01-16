@@ -3,9 +3,11 @@
 build*
 dist*
 *.egg-info
+
 *.test_results
-.tools*
 *-test-results.xml
+
+.tools*
 .venv*
 
 # vscode

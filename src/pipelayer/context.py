@@ -19,6 +19,6 @@ class Context(ABC):
     @abstractmethod
     def log(self) -> Any:
         """
-        Any type of Logger
+        A container for a Logger
         """
         raise NotImplementedError

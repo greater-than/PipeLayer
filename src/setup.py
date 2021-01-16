@@ -9,7 +9,7 @@ current_dir = os.path.dirname(__file__)
 
 
 def get_version() -> str:
-    return get_gitversion_output().get("SemVer", "0.0.1")
+    return get_gitversion_output().get("SemVer", "0.1.0")
 
 
 def get_gitversion_output() -> dict:
@@ -38,16 +38,21 @@ def get_requirements() -> list:
 
 
 setup_args = {
-    "name": "steampipe",
+    "name": "pipelayer",
     "version": "0.1.0",
-    "description": "greaterThan SteamPipe",
+    "description": "A lightweight pipeline framework",
     "long_description": get_long_description(),
     "long_description_content_type": "text/markdown",
-    "url": "https://github.com/greater-than/SteamPipe",
-    "classifiers": ["Programming Language :: Python :: 3.8"],
-    "author": "greaterThan",
+    "url": "https://github.com/greater-than/PipeLayer",
+    "classifiers": [
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.8",
+        "Topic :: Software Development :: Libraries :: Python Modules"
+    ],
+    "author": "greaterThan, LLC",
     "author_email": "info@greaterthan.solutions",
-    "packages": find_packages(),
+    "packages": find_packages(exclude=("test*")),
     "include_package_data": True,
     "install_requires": get_requirements(),
     "python_requires": ">=3.7",

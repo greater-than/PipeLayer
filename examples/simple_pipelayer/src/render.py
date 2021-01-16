@@ -1,7 +1,7 @@
 from typing import Any
 
-from steampipe import Manifest
-from steampipe.util import render_manifest
+from pipelayer import Manifest
+from pipelayer.util import render_manifest
 
 
 def print_manifest(manifest: Manifest) -> None:

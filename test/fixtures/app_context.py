@@ -1,7 +1,7 @@
 from logging import Logger
 from test.fixtures.app_settings import AppSettings
 
-from steampipe.context import Context
+from pipelayer import Context
 
 
 class AppContext(Context):

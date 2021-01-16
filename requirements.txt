@@ -1,6 +1,6 @@
 -r src/requirements.txt
--r examples/steampipe_microservice/requirements.txt
--r examples/simple_pipeline/requirements.txt
+-r examples/pipelayer_microservice/requirements.txt
+-r examples/simple_pipelayer/requirements.txt
 
 autopep8
 isort

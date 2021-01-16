@@ -4,11 +4,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Callable, List
 
-from steampipe.context import Context
-from steampipe.final import Final
-from steampipe.manifest import Manifest, ManifestEntry, ManifestStep
-from steampipe.settings import Settings  # noqa F401
-from steampipe.step import Step
+from pipelayer.context import Context
+from pipelayer.filter import Filter
+from pipelayer.final import Final
+from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
+from pipelayer.settings import Settings  # noqa F401
 
 
 class Pipeline:
@@ -43,41 +43,41 @@ class Pipeline:
         pipeline.__context = context
         return pipeline
 
-    def run(self, steps: List[Step], data: Any = None) -> Any:
+    def run(self, filters: List[Filter], data: Any = None) -> Any:
         """
         The Pipeline runner.
         """
         self.__manifest = Manifest(name=self.name)
         self.manifest.start = datetime.utcnow()
 
-        for step in steps:
-            manifest_step = ManifestStep(
-                name=step.name,
+        for filter in filters:
+            manifest_filter = FilterManifestEntry(
+                name=filter.name,
                 start=datetime.utcnow()
             )
 
-            if step.pre_process:
-                data = self._run_step_process(
+            if filter.pre_process:
+                data = self._run_filter_process(
                     self.context,
-                    manifest_step,
-                    step.pre_process,
+                    manifest_filter,
+                    filter.pre_process,
                     data
                 )
 
-            data = step.run(self.context, data)
+            data = filter.run(self.context, data)
 
-            if step.post_process:
-                data = self._run_step_process(
+            if filter.post_process:
+                data = self._run_filter_process(
                     self.context,
-                    manifest_step,
-                    step.post_process,
+                    manifest_filter,
+                    filter.post_process,
                     data,
                     False
                 )
 
-            manifest_step.end = datetime.utcnow()
-            manifest_step.duration = (manifest_step.end - manifest_step.end)
-            self.manifest.steps.append(manifest_step)
+            manifest_filter.end = datetime.utcnow()
+            manifest_filter.duration = (manifest_filter.end - manifest_filter.end)
+            self.manifest.filters.append(manifest_filter)
 
         self.manifest.end = datetime.utcnow()
         self.manifest.duration = (self.manifest.end - self.manifest.start)
@@ -85,20 +85,20 @@ class Pipeline:
         return data
 
     @staticmethod
-    def _run_step_process(context: Context, manifest_step: ManifestStep, process: Callable,
-                          data: Any, pre_process: bool = True) -> Any:
+    def _run_filter_process(context: Context, filter_manifest_entry: FilterManifestEntry, process: Callable,
+                            data: Any, pre_process: bool = True) -> Any:
 
-        step_process = ManifestEntry(
+        filter_process = ManifestEntry(
             name=process.__name__,
             start=datetime.utcnow()
         )
         data = process(context, data)
-        step_process.end = datetime.utcnow()
+        filter_process.end = datetime.utcnow()
 
         if pre_process:
-            manifest_step.pre_process = step_process
+            filter_manifest_entry.pre_process = filter_process
         else:
-            manifest_step.post_process = step_process
+            filter_manifest_entry.post_process = filter_process
         return data
 
     __metaclass__ = Final

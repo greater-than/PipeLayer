@@ -1,8 +1,8 @@
 from app_context import AppContext
-from steampipe import Step
+from pipelayer import Filter
 
 
-class HelloStep(Step):
+class HelloFilter(Filter):
 
     def run(self, context: AppContext, data: str = None) -> str:
         return "Hello"

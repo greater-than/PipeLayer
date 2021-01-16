@@ -3,11 +3,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Union
 
-from steampipe.context import Context
+from pipelayer.context import Context
 
 
-class Step(ABC):
-    def __init__(self: Step, name: str = "", pre_process: Callable = None, post_process: Callable = None):
+class Filter(ABC):
+    def __init__(self: Filter, name: str = "", pre_process: Callable = None, post_process: Callable = None) -> None:
         self.__name = name or self.__class__.__name__
         self.__pre_process = pre_process
         self.__post_process = post_process

@@ -1,6 +1,6 @@
 import json
 
-from steampipe.manifest import Manifest
+from pipelayer.manifest import Manifest
 
 
 def render_manifest(manifest: Manifest, indent: int = 2) -> str:

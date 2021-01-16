@@ -1,5 +1,5 @@
 # Manifest syntax https://docs.python.org/2/distutils/sourcedist.html
-graft steampipe
+graft pipelayer
 
 include README.*
 include LICENSE

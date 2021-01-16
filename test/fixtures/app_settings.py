@@ -1,4 +1,4 @@
-from steampipe.settings import Settings
+from pipelayer import Settings
 
 
 class AppSettings(Settings):

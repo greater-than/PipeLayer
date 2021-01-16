@@ -13,22 +13,22 @@ class ManifestEntry(BaseModel):
 
     class Config:
         json_encoders = {
-            datetime: lambda v: v.timestamp(),
+            datetime: lambda dt: dt.timestamp(),
             timedelta: timedelta_isoformat,
         }
+
+
+class FilterManifestEntry(ManifestEntry):
+    pre_process: Optional[ManifestEntry]
+    post_process: Optional[ManifestEntry]
 
 
 class ManifestEntryList(list):
     ...
 
 
-class ManifestStep(ManifestEntry):
-    pre_process: Optional[ManifestEntry]
-    post_process: Optional[ManifestEntry]
-
-
 class Manifest(ManifestEntry):
     """
     A running log of pipeline activity
     """
-    steps: ManifestEntryList = ManifestEntryList()
+    filters: ManifestEntryList = ManifestEntryList()

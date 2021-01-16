@@ -1,12 +1,12 @@
-# SteamPipe
-Steampipe is a lightweight pipeline framework. Define a series of reusable steps, and chain them together to create modular applications.
+# PipeLayer
+PipeLayer is a lightweight pipeline framework. Define a series of filters, and chain them together to create modular applications.
 
 ```python
 from app_context import AppContext
 from app_settings import AppSettings
-from steampipe.pipeline import Pipeline
-from hello_step import HelloStep
-from world_step import WorldStep
+from pipelayer import Pipeline
+from hello_filter import HelloFilter
+from world_filter import WorldFilter
 from logging import Logger
 
 app_settings = AppSettings()
@@ -14,15 +14,15 @@ app_context = AppContext(app_settings, Logger("Logger"))
 pipeline = Pipeline.create(app_context, "Hello World Pipeline")
 
 output = pipeline.run([
-    HelloStep(),
-    WorldStep()
+    HelloFilter(),
+    WorldFilter()
 ])
 
 print(f"Pipeline Output: {output}")
 print(pipeline.manifest.__dict__)
 ```
 
-See the package [README](./src/steampipe/README.md) for complete documentation and implementation steps.
+See the package [README](./src/pipelayer/README.md) for complete documentation and implementation steps.
 
 ## Examples
 

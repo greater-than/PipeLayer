@@ -22,11 +22,11 @@ print(f"Pipeline Output: {output}")
 print(pipeline.manifest.__dict__)
 ```
 
-See the package [README](src/pipelayer/README.md) for complete documentation and implementation steps.
+See the package [README](src/README.md) for complete documentation and implementation steps.
 
 ## Examples
 
-* [Simple Pipeline](examples/simple_pipeline/README.md)
+* [Simple Pipeline](examples/simple_pipelayer/README.md)
 
 ## License
 The license can be [found here](LICENSE)

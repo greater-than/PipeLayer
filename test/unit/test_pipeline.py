@@ -29,4 +29,8 @@ class TestPipeline:
         pipeline = Pipeline.create(context)
         response = pipeline.run(filters)
 
+        assert pipeline.name == "Pipeline"
+        assert pipeline.manifest.name == "Pipeline"
+        assert pipeline.manifest.filters[0].name == "FirstFilter"
         assert response == '{"something": "goes here"}'
+        assert isinstance(pipeline.manifest.__dict__, dict)

@@ -2,7 +2,7 @@ from logging import Logger
 
 # =========================================================================
 # Remove this patch if running the example outside of the pipelayer project
-import _path_patch  # noqa F401
+import _path_patch  # NOQA F401
 # -------------------------------------------------------------------------
 from app_context import AppContext
 from app_settings import AppSettings

@@ -2,5 +2,5 @@
 max-line-length = 120
 inline-quotes = double
 include = src
-exclude = venv
-max-complexity = 18
+extend-exclude = venv
+max-complexity = 10

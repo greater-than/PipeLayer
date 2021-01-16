@@ -14,6 +14,17 @@ function Write_Banner {
     Write-Host $message
 }
 
+function Write_Footer {
+    param(
+        [string] $message
+    )
+    Write-Host "--------------------------------------------------------------------------------"
+    Write-Host $message
+    Write-Host "================================================================================"
+    Write-Host "greaterThan, LLC  | info@greaterthan.solutions | https://github.com/greater-than"
+    Write-Host ""
+}
+
 function Write_Command {
     param(
         [string] $command,
@@ -194,6 +205,48 @@ function Delete_PyCache {
     }
 }
 
+function Delete_Build_Artifacts {
+    Write_Banner "Delete Build Artifacts"
+    if (Test-Path -Path "build") {
+        Remove-Item build -Recurse -Force
+    }
+    if (Test-Path -Path "dist") {
+        Remove-Item dist -Recurse -Force
+    }
+    if (Test-Path -Path "*.egg-info") {
+        Remove-Item *.egg-info -Recurse -Force
+    }
+}
+function Delete_Virtual_Environment {
+    param(
+        [Parameter(Mandatory = $false)][string] $venvName
+    )
+
+    if (-not($venvName)) { $venvName = ".venv" }
+    if (Test-Path -Path $venvName -PathType Container) {
+        Write_Banner "De-activating Virtual Environment: $venvName"
+        & ".\$venvName\Scripts\deactivate.bat"
+    }
+
+    if (Test-Path -Path $venvName) {
+        Remove-Item $venvName -Recurse -Force
+    }
+}
+
+function Clean_Project {
+    try {
+        Delete_Build_Artifacts
+        Delete_Virtual_Environment
+        Delete_PyCache
+    }
+    catch {
+        Write-Host "*** Delete PyCache Failed ***"
+        Write-Host "##vso[task.complete result=failed]"
+        throw
+    }
+
+}
+
 function Run_Unit_Tests {
     try {
         Write_Banner "Run Unit Tests"
@@ -223,7 +276,7 @@ function Run_Integration_Tests {
 function Create_Package {
     try {
         Write_Banner "Create Package"
-        $arguments = "./src/setup.py sdist bdist_wheel"
+        $arguments = "./setup.py sdist bdist_wheel"
         Execute_Command "python" $arguments
     }
     catch {

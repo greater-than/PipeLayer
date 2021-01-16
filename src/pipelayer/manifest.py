@@ -7,7 +7,7 @@ from pydantic.json import timedelta_isoformat
 
 class ManifestEntry(BaseModel):
     name: str
-    start: Optional[datetime]
+    start: datetime
     end: Optional[datetime]
     duration: Optional[timedelta]
 

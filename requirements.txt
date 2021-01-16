@@ -7,7 +7,6 @@ isort
 flake8
 flake8-quotes
 
-typing
 mypy
 
 pytest
@@ -16,7 +15,7 @@ pytest-mock
 pytest-nunit
 coverage[toml]
 
-# poetry
+poetry
 pre-commit
 setuptools
 wheel

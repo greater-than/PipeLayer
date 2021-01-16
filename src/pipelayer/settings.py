@@ -3,6 +3,6 @@ from pydantic import BaseModel
 
 class Settings(BaseModel):
     """
-    Base model for app settings.
+    Base model for app settings
     """
     ...

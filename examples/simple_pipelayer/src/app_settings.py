@@ -7,4 +7,4 @@ class AppSettings(Settings):
 
     The Settings class inherits from pydantic.BaseModel, so fields must be typed appropriately
     """
-    ...
+    pass

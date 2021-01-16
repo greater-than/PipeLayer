@@ -1,6 +1,7 @@
 . .\scripts\_lib
 
 try {
+    Delete_Build_Artifacts
     Create_Package
 }
 catch {

@@ -9,7 +9,7 @@ current_dir = os.path.dirname(__file__)
 
 
 def get_version() -> str:
-    return get_gitversion_output().get("SemVer", "0.1.0")
+    return get_gitversion_output().get("SemVer", "0.0.1")
 
 
 def get_gitversion_output() -> dict:

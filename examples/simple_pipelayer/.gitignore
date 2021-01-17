@@ -1,0 +1,26 @@
+# project folders
+.build*
+build*
+dist*
+*.egg-info
+
+*.test_results
+*-test-results.xml
+
+.tools*
+.venv*
+
+# vscode
+*.code-workspace
+.vscode
+
+# python
+.mypy_cache
+.pytest_cache
+__pycache__
+*.py[co]
+
+FUTURE.md
+
+# temp
+examples/pipelayer_microservice*

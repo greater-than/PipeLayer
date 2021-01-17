@@ -19,3 +19,4 @@ poetry
 pre-commit
 setuptools
 wheel
+twine

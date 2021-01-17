@@ -1,3 +1,3 @@
 . .\scripts\_lib.ps1
 
-Run_MyPy
+Run_PreCommit_Checks

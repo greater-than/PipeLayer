@@ -4,4 +4,3 @@ Write_Header "Project Setup"
 Setup_Venv
 Install_Requirements
 Install_PreCommit_Hooks
-Install_Tools

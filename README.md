@@ -29,8 +29,6 @@ print(pipeline.manifest.__dict__)
 * [Quick Start](#quick-start)
 * [The Framework](#the-framework)
 * [Examples](#examples)
-* [License](#license)
-* [Version History](HISTORY.md)
 <br><br>
 
 ## Installation
@@ -217,14 +215,4 @@ The settings class is an optional base class for applications settings that inhe
 
 ### __`pipelayer.Manifest`__
 The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) activity.
-<br><br>
 
-
-## Examples
-
-* [Simple PipeLayer](examples/simple_pipelayer)
-<br><br>
-
-
-## License
-The license can be [found here](LICENSE)

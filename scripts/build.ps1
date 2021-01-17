@@ -1,9 +1,9 @@
 . .\scripts\_lib.ps1
 
-Write_Header "Build"
+Write_Header "Build Package"
 Clean_Project
 
-Setup_Venv ".venv"
+Setup_Venv
 Install_Requirements
 Install_Tools
 

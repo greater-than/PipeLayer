@@ -1,0 +1,21 @@
+[tool.autopep8]
+max_line_length = 120
+ignore = "E501,W6"
+
+
+[tool.pytest.ini_options]
+testpaths = [
+    "test"
+]
+addopts = [
+    "-v",
+    "-cov-report xml",
+    "-cov-report term",
+    "--strict-markers"
+]
+markers = [
+    "integration",
+    "unit",
+    "happy",
+    "sad"
+]

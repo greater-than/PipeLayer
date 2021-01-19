@@ -1,6 +1,4 @@
 -r src/requirements.txt
--r examples/pipelayer_microservice/requirements.txt
--r examples/simple_pipelayer/requirements.txt
 
 autopep8
 isort

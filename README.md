@@ -145,6 +145,7 @@ run app.py
 * [Context](#pipelayer.context)
 * [Settings](#pipelayer.settings)
 * [Manifest](#pipelayer.manifest)
+* [Utilities](#utilities)
 <br><br>
 
 

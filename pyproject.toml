@@ -21,5 +21,5 @@ markers = [
 ]
 
 [tool.coverage.report]
-fail_under = 10
+fail_under = 100
 show_missing = true

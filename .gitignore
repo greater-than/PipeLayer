@@ -21,6 +21,3 @@ __pycache__
 *.py[co]
 
 FUTURE.md
-
-# temp
-examples/pipelayer_microservice*

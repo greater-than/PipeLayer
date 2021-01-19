@@ -1,2 +1,17 @@
-# Uncomment the next line if running the app outside of the this project
-# pipelayer~=0.1.0
+-r src/requirements.txt
+
+autopep8
+isort
+flake8
+flake8-quotes
+
+mypy
+
+pytest
+pytest-cov
+pytest-mock
+pytest-nunit
+coverage[toml]
+
+poetry
+pre-commit

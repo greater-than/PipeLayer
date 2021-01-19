@@ -215,18 +215,6 @@ function Delete_PyCache {
     }
 }
 
-function Delete_Build_Artifacts {
-    Write_Banner "Delete Build Artifacts"
-    if (Test-Path -Path "build") {
-        Remove-Item build -Recurse -Force
-    }
-    if (Test-Path -Path "dist") {
-        Remove-Item dist -Recurse -Force
-    }
-    if (Test-Path -Path "*.egg-info") {
-        Remove-Item *.egg-info -Recurse -Force
-    }
-}
 function Delete_Virtual_Environment {
     param(
         [string] $venvName
@@ -247,7 +235,6 @@ function Delete_Virtual_Environment {
 function Clean_Project {
     try {
         Write_Header "Clean Project"
-        Delete_Build_Artifacts
         Delete_Virtual_Environment
         Delete_PyCache
     }
@@ -279,39 +266,6 @@ function Run_Integration_Tests {
     }
     catch {
         Write-Host "*** Run Integration Tests Failed ***"
-        Write-Host "##vso[task.complete result=failed]"
-        throw
-    }
-}
-
-function Create_Package {
-    try {
-        Write_Banner "Create Package"
-        $arguments = "./setup.py sdist bdist_wheel"
-        Execute_Command "python" $arguments
-    }
-    catch {
-        Write-Host "*** Create Package Failed ***"
-        Write-Host "##vso[task.complete result=failed]"
-        throw
-    }
-}
-
-function Publish_Package {
-    param(
-        [string] $isPyPi = $false
-    )
-    $server = "testpypi"
-    if ($isPyPi) {
-        $server = "pypi"
-    }
-    try {
-        Write_Header "Publish Package"
-        $arguments = "upload --repository $server dist/*"
-        Execute_Command "twine" $arguments
-    }
-    catch {
-        Write-Host "*** Publish Package Failed ***"
         Write-Host "##vso[task.complete result=failed]"
         throw
     }

@@ -1,5 +1,4 @@
 . .\scripts\_lib.ps1
 
-Write_Header "Publishing Package to PyPi"
-# Publish_Package
+Publish_Package  # $true  # Uncomment to publish to pypi.org
 Delete_Build_Artifacts

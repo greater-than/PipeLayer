@@ -19,3 +19,7 @@ markers = [
     "happy",
     "sad"
 ]
+
+[tool.coverage.report]
+fail_under = 10
+show_missing = true

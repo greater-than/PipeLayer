@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+import inspect
 from datetime import datetime
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
@@ -77,15 +78,14 @@ class Pipeline:
         Optional[Callable[[Context, Any], Any]],
         Optional[Callable[[Context, Any], Any]]
     ]:
-
-        if type(filter) is Filter and not isinstance(filter, Filter):
+        if inspect.isclass(filter) and issubclass(type(filter), Filter):
             # The checks should have isolated the type, but mypy complains
             filter = filter()  # type: ignore
 
         if isinstance(filter, Filter):
             return filter.run, filter.pre_process, filter.post_process
 
-        func = filter if callable(filter) else lambda context, data: data
+        func = filter if inspect.isfunction(filter) else lambda context, data: data
 
         return func, None, None
 

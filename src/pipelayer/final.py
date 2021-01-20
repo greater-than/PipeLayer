@@ -12,5 +12,5 @@ class Final(type):
     def __new__(cls: Type[T], name: str, bases: Tuple[type, ...], classdict: dict) -> Final:
         for b in bases:
             if isinstance(b, Final):
-                raise TypeError("type '{0}' is not an acceptable base type".format(b.__name__))
+                raise TypeError(f"type '{b.__name__}' is not an acceptable base type")
         return cast(Final, type.__new__(cls, name, bases, dict(classdict)))

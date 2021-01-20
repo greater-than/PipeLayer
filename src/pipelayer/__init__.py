@@ -78,7 +78,7 @@ class Pipeline:
         Optional[Callable[[Context, Any], Any]],
         Optional[Callable[[Context, Any], Any]]
     ]:
-        if inspect.isclass(filter) and issubclass(type(filter), Filter):
+        if inspect.isclass(filter) and issubclass(filter, Filter):  # type: ignore
             # The checks should have isolated the type, but mypy complains
             filter = filter()  # type: ignore
 

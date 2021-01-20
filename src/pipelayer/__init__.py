@@ -45,7 +45,7 @@ class Pipeline:
         self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
 
         for filter in filters:
-            filter_name = filter.name if isinstance(filter, Filter) else filter.__name__
+            filter_name = filter.name if isinstance(filter, Filter) else ""
             manifest_entry = FilterManifestEntry(name=filter_name, start=datetime.utcnow())
 
             # initialize
@@ -72,9 +72,11 @@ class Pipeline:
         return data
 
     @staticmethod
-    def __initialize_filter(
-        filter: Union[Filter, Type[Filter], Callable[[Context, Any], Any]]
-    ) -> Tuple[Callable[[Context, Any], Any], Union[Callable[..., Any], None], Union[Callable[..., Any], None]]:
+    def __initialize_filter(filter: Union[Filter, Type[Filter], Callable[[Context, Any], Any]]) -> Tuple[
+        Callable[[Context, Any], Any],
+        Optional[Callable[[Context, Any], Any]],
+        Optional[Callable[[Context, Any], Any]]
+    ]:
 
         if type(filter) is Filter and not isinstance(filter, Filter):
             # The checks should have isolated the type, but mypy complains
@@ -83,16 +85,16 @@ class Pipeline:
         if isinstance(filter, Filter):
             return filter.run, filter.pre_process, filter.post_process
 
-        func = filter if type(filter) == callable else lambda context, data: data
+        func = filter if callable(filter) else lambda context, data: data
 
         return func, None, None
 
-    def __run_filter_process(self, process: Optional[Callable], data: Any) -> Tuple[ManifestEntry, Any]:
+    def __run_filter_process(self, process: Optional[Callable], data: Any) -> Tuple[Optional[ManifestEntry], Any]:
         """
         The filter pre/post process runner
         """
         if not process:
-            return data
+            return None, data
 
         process_manifest_entry = ManifestEntry(name=process.__name__, start=datetime.utcnow())
 

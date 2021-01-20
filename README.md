@@ -1,5 +1,5 @@
 # PipeLayer
-PipeLayer is a lightweight pipeline framework. Define a series of filters, and chain them together to create modular applications.
+PipeLayer is a lightweight Python pipeline framework. Define a series of filters, and chain them together to create modular applications.
 
 ```python
 from app_context import AppContext
@@ -216,4 +216,11 @@ The settings class is an optional base class for applications settings that inhe
 
 ### __`pipelayer.Manifest`__
 The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) activity.
+
+
+### Utilities
+
+
+### __`pipelayer.util.render_manifest(manifest: Manifest, indent: int = 2) -> str`__
+Static function that renders formatted JSON data
 

@@ -15,6 +15,10 @@ class MockFilter(Filter):
         return data
 
 
+def mock_static_filter(context: Context, data: Any) -> Any:
+    return data
+
+
 def render_manifest(manifest: Manifest, indent: int = 2) -> str:
     """
     Renders a formatted Manifest

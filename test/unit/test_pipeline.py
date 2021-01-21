@@ -37,6 +37,7 @@ class TestPipeline:
 
     @pytest.mark.happy
     def test_pipeline_static_filter_funcs(self, app_context):
+        import json
         from test.fixtures.app_context import AppContext
 
         class FirstFilter(Filter):
@@ -49,7 +50,8 @@ class TestPipeline:
 
         filters = [
             FirstFilter,
-            second_filter
+            second_filter,
+            lambda context, data: json.dumps(data)
         ]
 
         context = app_context
@@ -58,6 +60,8 @@ class TestPipeline:
 
         assert pipeline.name == "Pipeline"
         assert pipeline.manifest.name == "Pipeline"
-        assert pipeline.manifest.filters[0].name == ""
-        assert response == {"something": "got changed"}
+        assert pipeline.manifest.filters[0].name == "FirstFilter"
+        assert pipeline.manifest.filters[1].name == "second_filter"
+        assert pipeline.manifest.filters[2].name == "lambda context, data: json.dumps(data)"
+        assert response == '{"something": "got changed"}'
         assert isinstance(pipeline.manifest.__dict__, dict)

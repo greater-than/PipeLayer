@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import inspect
@@ -6,6 +5,7 @@ from datetime import datetime
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 from pipelayer.context import Context
+from pipelayer.exception import InvalidFilterException
 from pipelayer.filter import Filter
 from pipelayer.final import Final
 from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
@@ -45,12 +45,10 @@ class Pipeline:
         """
         self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
 
-        for filter in filters:
-            filter_name = filter.name if isinstance(filter, Filter) else ""
-            manifest_entry = FilterManifestEntry(name=filter_name, start=datetime.utcnow())
+        for filter in [Pipeline.__initialize_filter(filter) for filter in filters]:
+            filter_name, filter_func, pre_process, post_process = filter
 
-            # initialize
-            filter_func, pre_process, post_process = self.__initialize_filter(filter)
+            manifest_entry = FilterManifestEntry(name=filter_name, start=datetime.utcnow())
 
             # pre_process
             manifest_entry.pre_process, data = self.__run_filter_process(pre_process, data)
@@ -74,20 +72,32 @@ class Pipeline:
 
     @staticmethod
     def __initialize_filter(filter: Union[Filter, Type[Filter], Callable[[Context, Any], Any]]) -> Tuple[
+        str,
         Callable[[Context, Any], Any],
         Optional[Callable[[Context, Any], Any]],
         Optional[Callable[[Context, Any], Any]]
     ]:
-        if inspect.isclass(filter) and issubclass(filter, Filter):  # type: ignore
+        name = ""
+        if inspect.isclass(filter):
             # The checks should have isolated the type, but mypy complains
-            filter = filter()  # type: ignore
+            filter = filter(filter.__name__)  # type: ignore
 
-        if isinstance(filter, Filter):
-            return filter.run, filter.pre_process, filter.post_process
+        if isinstance(filter, Filter) and issubclass(filter.__class__, Filter):
+            return filter.name, filter.run, filter.pre_process, filter.post_process
 
-        func = filter if inspect.isfunction(filter) else lambda context, data: data
+        if not Pipeline.__is_callable_valid(filter):
+            raise InvalidFilterException(("Filter functions cannot be 'None' and must have two arguments."))
 
-        return func, None, None
+        name = inspect.getsource(filter).strip() if filter.__name__ == "<lambda>" else filter.__name__
+
+        return name, filter, None, None
+
+    @staticmethod
+    def __is_callable_valid(obj: Callable[..., Any]) -> bool:
+        if not obj or not inspect.isfunction(obj):
+            return False
+        sig = inspect.signature(obj)
+        return len(sig.parameters) == 2
 
     def __run_filter_process(self, process: Optional[Callable], data: Any) -> Tuple[Optional[ManifestEntry], Any]:
         """

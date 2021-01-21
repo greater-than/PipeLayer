@@ -1,0 +1,40 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.pythonPath": ".venv\\Scripts\\python.exe",
+        "python.analysis.extraPaths": [
+            "./src",
+            "./test",
+            "./examples/simple_pipelayer/src",
+            "./examples/pipelayer_microservice/src",
+        ],
+        "python.formatting.provider": "autopep8",
+        "editor.formatOnSave": true,
+        "python.formatting.autopep8Args": [
+            "--max_line_length",
+            "120"
+        ],
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.lintOnSave": true,
+        "python.linting.flake8Args": [
+            "--max-line-length",
+            "120",
+            "--inline-quotes",
+            "double",
+            "--exclude",
+            ".venv"
+        ],
+        "editor.semanticHighlighting.enabled": true,
+        "python.testing.pytestArgs": [
+            "test"
+        ],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestEnabled": true
+    }
+}

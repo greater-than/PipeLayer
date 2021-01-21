@@ -4,8 +4,10 @@ build
 dist
 *.egg-info
 
+# test
 *.test_results
 *-test-results.xml
+.coverage
 
 .tools*
 .venv*

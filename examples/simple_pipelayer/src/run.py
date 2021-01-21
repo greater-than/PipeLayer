@@ -1,7 +1,7 @@
 from app.app import main
 from app.render import print_manifest, print_output
 
-manifest, output = main()
+pipeline, output = main()
 
-print_manifest(manifest)
+print_manifest(pipeline.manifest)
 print_output(output)

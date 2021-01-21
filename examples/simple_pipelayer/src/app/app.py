@@ -1,11 +1,10 @@
-# =========================================================================
-# Remove this patch if running the example outside of the pipelayer project
 from logging import Logger
 from typing import Any, Tuple
 
 from pipelayer import Pipeline
-from pipelayer.manifest import Manifest
 
+# =========================================================================
+# Remove this patch if running the example outside of the pipelayer project
 import app._path_patch  # NOQA F401
 from app.app_context import AppContext
 from app.app_settings import AppSettings
@@ -14,15 +13,15 @@ from app.filter.hello_filter import HelloFilter
 from app.filter.world_filter import WorldFilter
 
 
-def main() -> Tuple[Manifest, Any]:
+def main() -> Tuple[Pipeline, Any]:
     app_settings = AppSettings()
 
     context = AppContext(app_settings, Logger("Logger"))
-    pipeline = Pipeline.create(context, "Hello World")
+    pipeline = Pipeline.create(context, "Hello World Pipeline")
     filters = [
         HelloFilter,
         WorldFilter(post_process=create_response)
     ]
     output = pipeline.run(filters, None)
 
-    return pipeline.manifest, output
+    return pipeline, output

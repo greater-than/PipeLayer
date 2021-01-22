@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 from pipelayer.context import Context
 
@@ -25,5 +25,5 @@ class Filter(ABC):
         return self.__post_process
 
     @abstractmethod
-    def run(self, context: Context, data: Any) -> Any:
+    def run(self, context: Union[Context, Any], data: Any) -> Any:
         raise NotImplementedError

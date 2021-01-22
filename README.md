@@ -1,34 +1,14 @@
 # PipeLayer
 PipeLayer is a lightweight Python pipeline framework. Define a series of filters, and chain them together to create modular applications.
-
-```python
-from app_context import AppContext
-from app_settings import AppSettings
-from pipelayer import Pipeline
-from hello_filter import HelloFilter
-from world_filter import WorldFilter
-from logging import Logger
-
-app_settings = AppSettings()
-app_context = AppContext(app_settings, Logger("Logger"))
-pipeline = Pipeline.create(app_context, "Hello World Pipeline")
-
-output = pipeline.run([
-    HelloFilter(),
-    WorldFilter()
-])
-
-print(f"Pipeline Output: {output}")
-print(pipeline.manifest.__dict__)
-```
 <br>
 
 ### Table of Contents
 
 * [Installation](#installation)
-* [Quick Start](#quick-start)
+* [Getting Started](#getting-started)
 * [The Framework](#the-framework)
-* [Examples](#examples)
+* _[VERSION HISTORY](.HISTORY.md)_
+* _[LICENSE](.LICENSE.txt)_
 <br><br>
 
 ## Installation
@@ -38,10 +18,10 @@ From the command line:
 pip install pipelayer
 ```
 
-## Quick Start
+## Getting Started
 
 ### Step 1: Application Settings
-Create a class called AppSettings that inherits from the [`pipelayer.Settings`](Settings) class:
+Create a class called AppSettings that inherits from [`pipelayer.Settings`](Settings):
 
 `app_settings.py`
 ```python
@@ -84,9 +64,12 @@ class AppContext(Context):
 ```
 
 ### Step 3: Create Pipeline Filters
-Create classes that inherits from `pipelayer.Filter`:
+Filters can be defined in the following ways:
+* Classes that inherits from `pipelayer.Filter` and implement the `run` method
+* Functions (instance/class/static/module) that have the following signature `func(context: Any, data: Any)`
+* Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions: `my_func = lambda context, data: data`
 
-`hello_filter.py`
+`hello_world_filters.py`
 ```python
 from pipelayer import Filter
 
@@ -94,16 +77,17 @@ from pipelayer import Filter
 class HelloFilter(Filter):
     def run(self, context) -> str:
         return "Hello"
-```
-
-`world_filter.py`
-```python
-from pipelayer import Filter
 
 
 class WorldFilter(Filter):
     def run(self, context, data) -> str:
-        return data + " World!"
+        return f"{data},  World!"
+```
+
+`functions.py`
+```python
+def create_message_dict(context, data: str) -> dict:
+    return {"message": data}
 ```
 
 ### Step 4: Create a Pipeline
@@ -111,21 +95,26 @@ Create a module to run the pipeline:
 
 `app.py`
 ```python
+from logging import Logger
+from pipelayer import Pipeline
+
 from app_context import AppContext
 from app_settings import AppSettings
-from pipelayer import Pipeline
-from hello_filter import HelloFilter
-from world_filter import WorldFilter
-from logging import Logger
+from functions import create_message
+from hello_world_filters import HelloFilter, WorldFilter
 
 app_settings = AppSettings()
 app_context = AppContext(app_settings, Logger("Logger"))
 hello_world_pipeline = Pipeline.create(app_context, "Hello World Pipeline")
 
 output = hello_world_pipeline.run([
-    HelloFilter(),
-    WorldFilter()
+    HelloFilter,                           # pipeline.Filter type
+    WorldFilter(),                         # pipeline.Filter instance
+    create_message_dict                    # function type
+    lambda context, data: json.dumps(data) # anonymous function
 ])
+
+# output = '{"message": "Hello, World!"}'
 
 print(f"Pipeline Output: {output}")
 print(hello_world_pipeline.manifest.__dict__)
@@ -164,7 +153,7 @@ An instance of `pipelayer.Manifest` that is created at runtime.
 
 ***Methods***
 
-__`create(context: Context, name: str = "") -> Pipeline`__<br>
+__`create(context: Union[Context, Any], name: str = "") -> Pipeline`__<br>
 The factory method to create a pipeline
 
 __`run(filters: List[Filter], data: Any = None) -> Any`__<br>
@@ -188,7 +177,7 @@ Optional.
 
 ***Methods***
 
-__`run(context: Context, data: Any) -> Any`__<br>
+__`run(context: Union[Context, Any], data: Any) -> Any`__<br>
 The type of the `data` argument in the abstract class is `Any`, but you can use the correct type for the data when implementing method. The same is true for the return type.
 <br><br>
 

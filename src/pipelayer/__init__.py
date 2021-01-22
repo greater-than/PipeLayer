@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 from pipelayer.context import Context
-from pipelayer.exception import InvalidFilterException
+from pipelayer.exception import InvalidFilterException, PipelineException
 from pipelayer.filter import Filter
 from pipelayer.final import Final
 from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
@@ -14,7 +14,7 @@ from pipelayer.settings import Settings  # NOQA F401
 
 class Pipeline:
     __name: str
-    __context: Context
+    __context: Union[Context, Any]
     __manifest: Manifest
 
     @property
@@ -22,7 +22,7 @@ class Pipeline:
         return self.__name
 
     @property
-    def context(self) -> Context:
+    def context(self) -> Union[Context, Any]:
         return self.__context
 
     @property
@@ -30,7 +30,7 @@ class Pipeline:
         return self.__manifest
 
     @classmethod
-    def create(cls, context: Context, name: str = "") -> Pipeline:
+    def create(cls, context: Union[Context, Any], name: str = "") -> Pipeline:
         """
         Pipeline factory
         """
@@ -51,13 +51,22 @@ class Pipeline:
             manifest_entry = FilterManifestEntry(name=filter_name, start=datetime.utcnow())
 
             # pre_process
-            manifest_entry.pre_process, data = self.__run_filter_process(pre_process, data)
+            try:
+                manifest_entry.pre_process, data = self.__run_filter_process(pre_process, data)
+            except Exception as e:
+                raise PipelineException(inner_exception=e)
 
             # filter
-            data = filter_func(self.context, data)
+            try:
+                data = filter_func(self.context, data)
+            except Exception as e:
+                raise PipelineException(inner_exception=e)
 
             # post_process
-            manifest_entry.post_process, data = self.__run_filter_process(post_process, data)
+            try:
+                manifest_entry.post_process, data = self.__run_filter_process(post_process, data)
+            except Exception as e:
+                raise PipelineException(inner_exception=e)
 
             manifest_entry.end = datetime.utcnow()
             manifest_entry.duration = (manifest_entry.end - manifest_entry.start)
@@ -88,7 +97,7 @@ class Pipeline:
         if not Pipeline.__is_callable_valid(filter):
             raise InvalidFilterException(("Filter functions cannot be 'None' and must have two arguments."))
 
-        name = inspect.getsource(filter).strip() if filter.__name__ == "<lambda>" else filter.__name__
+        name = f"[{inspect.getsource(filter).strip()}]" if filter.__name__ == "<lambda>" else filter.__name__
 
         return name, filter, None, None
 

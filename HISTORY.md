@@ -1,6 +1,6 @@
 # Version History
 
-## 0.2.0 - 1/23/21
+## 0.2.0 - 1/22/21
 * Adds support for static/module/lamba functions as well as `pipelayer.Filter` types as Pipeline Filters
 * Basic signature validation for filter functions
 * context property in `pipelayer.Filter` is typed as `Union[Context, Any]`

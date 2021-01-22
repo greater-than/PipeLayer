@@ -1,6 +1,6 @@
 # Version History
 
-## 0.2.0 - 1/13/21
+## 0.2.0 - 1/23/21
 * Adds support for static/module/lamba methods as well as `pipelayer.Filter` types as Pipeline Filters
 * Adds support for type of `pipelayer.Filter` as Pipeline Filters
 * Basic signature validation for filter functions

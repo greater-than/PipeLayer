@@ -7,8 +7,8 @@ PipeLayer is a lightweight Python pipeline framework. Define a series of filters
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [The Framework](#the-framework)
-* _[VERSION HISTORY](.HISTORY.md)_
-* _[LICENSE](.LICENSE.txt)_
+* _[VERSION HISTORY](HISTORY.md)_
+* _[LICENSE](LICENSE.txt)_
 <br><br>
 
 ## Installation

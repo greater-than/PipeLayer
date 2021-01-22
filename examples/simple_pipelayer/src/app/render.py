@@ -17,16 +17,14 @@ class Color:
 
 
 def print_manifest(manifest: Manifest) -> None:
-    print(f"{Color.OKCYAN}=================={Color.ENDC}")
-    print(f"{Color.BOLD}Pipeline Manifest:{Color.ENDC}")
-    print(f"{Color.OKCYAN}------------------{Color.ENDC}")
-    print(render_manifest(manifest))
-    print("")
+    _render("MANIFEST", render_manifest(manifest))
 
 
 def print_output(output: Any) -> None:
-    print(f"{Color.OKCYAN}=================={Color.ENDC}")
-    print(f"{Color.BOLD}Pipeline Output:{Color.ENDC}")
-    print(f"{Color.OKCYAN}------------------{Color.ENDC}")
-    print(output)
-    print("")
+    _render("OUTPUT", output)
+
+
+def _render(message: str, output: Any) -> None:
+    print(f"{Color.OKCYAN}--------------------------------------------------------------------------------{Color.ENDC}")
+    print(f"{Color.OKGREEN}{message}:{Color.ENDC}\n")
+    print(output + "\n")

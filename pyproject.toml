@@ -9,8 +9,8 @@ testpaths = [
 ]
 addopts = [
     "-v",
-    "-cov-report xml",
-    "-cov-report term",
+    "-cov-report=xml",
+    "-cov-report=term-missing",
     "--strict-markers"
 ]
 markers = [
@@ -20,6 +20,9 @@ markers = [
     "sad"
 ]
 
+[tool.coverage.paths]
+source = ["src"]
+
 [tool.coverage.report]
-fail_under = 10
+fail_under = 95
 show_missing = true

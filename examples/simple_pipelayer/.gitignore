@@ -11,7 +11,6 @@ dist
 .venv*
 
 # vscode
-*.code-workspace
 .vscode
 
 # python
@@ -21,6 +20,3 @@ __pycache__
 *.py[co]
 
 FUTURE.md
-
-# temp
-examples/pipelayer_microservice*

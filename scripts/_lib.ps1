@@ -261,7 +261,7 @@ function Clean_Project {
 function Run_Unit_Tests {
     try {
         Write_Banner "Run Unit Tests"
-        $arguments = "-m pytest -m unit --nunit-xml=.test_results/unit-test-results.xml"
+        $arguments = "-m pytest -m unit --nunit-xml=.test_results/unit-test-results.xml --cov=src --cov-config=pyproject.toml"
         Execute_Command "python" $arguments
     }
     catch {

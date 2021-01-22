@@ -4,14 +4,15 @@ build
 dist
 *.egg-info
 
+# test
 *.test_results
 *-test-results.xml
+.coverage
 
 .tools*
 .venv*
 
 # vscode
-*.code-workspace
 .vscode
 
 # python
@@ -21,6 +22,3 @@ __pycache__
 *.py[co]
 
 FUTURE.md
-
-# temp
-examples/pipelayer_microservice*

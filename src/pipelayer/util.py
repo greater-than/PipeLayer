@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Union
 
 from pipelayer.context import Context
 from pipelayer.filter import Filter
@@ -11,7 +11,7 @@ class MockFilter(Filter):
     For patching pipeline filters in unit tests
     """
 
-    def run(self, context: Context, data: Any) -> Any:
+    def run(self, context: Union[Context, Any], data: Any) -> Any:
         return data
 
 

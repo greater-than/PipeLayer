@@ -34,5 +34,17 @@
         "python.testing.unittestEnabled": false,
         "python.testing.nosetestsEnabled": false,
         "python.testing.pytestEnabled": true
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Python: Run App",
+                "type": "python",
+                "request": "launch",
+                "program": "./src/run.py",
+                "console": "integratedTerminal"
+            }
+        ]
     }
 }

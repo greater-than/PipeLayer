@@ -1,7 +1,4 @@
-from pipelayer import Settings
-
-
-class AppSettings(Settings):
+class AppSettings:
     """
     Complete this by adding constants, key/value data from AWS Parameter Store, etc
 

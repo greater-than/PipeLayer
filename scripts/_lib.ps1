@@ -75,7 +75,7 @@ function Setup_Venv {
         }
 
         Write_Banner "Create Virtual Environment: $venvName"
-        $arguments = "-m virtualenv $venvName --pip=20.3.3 --download"
+        $arguments = "-m virtualenv $venvName --pip=21.0.0 --download"
         Execute_Command "python" $arguments
 
         Activate_Venv $venvName

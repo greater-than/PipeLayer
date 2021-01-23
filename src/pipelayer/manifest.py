@@ -7,9 +7,9 @@ from pydantic.json import timedelta_isoformat
 
 
 class StepType(Enum):
-    PIPELINE = 1
-    FILTER = 2
-    FUNCTION = 3
+    PIPELINE = "pipeline"
+    FILTER = "filter"
+    FUNCTION = "function"
 
 
 class ManifestEntry(BaseModel):
@@ -34,11 +34,6 @@ class StepManifestEntry(ManifestEntry):
     steps: Optional[ManifestEntryList]
     pre_process: Optional[ManifestEntry]
     post_process: Optional[ManifestEntry]
-
-    class Config:
-        json_encoders = {
-            StepType: lambda st: st.name.lower()
-        }
 
 
 class Manifest(ManifestEntry):

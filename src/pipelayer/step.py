@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, Union
-
-from pipelayer.context import Context
+from typing import Any
 
 
 class Step(ABC):
@@ -14,5 +12,5 @@ class Step(ABC):
     def name(self) -> str:
         return self.__name
 
-    def run(self, context: Union[Context, Any], data: Any) -> Any:
+    def run(self, data: Any, context: Any) -> Any:
         raise NotImplementedError

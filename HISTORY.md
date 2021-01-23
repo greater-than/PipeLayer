@@ -1,7 +1,7 @@
 # Version History
 
 ## 0.3.0 - 1/30/21
-It's still a beta package, and decided against bumping the version to 1.0.0--despite the breaking changes.
+It's still a beta package and decided against bumping the version to 1.0.0--despite the breaking changes.
 
 What's New:
 * Nested pipelines
@@ -9,14 +9,14 @@ What's New:
 
 BREAKING CHANGES:
 * `pipelayer.Pipeline.filters` renamed to `steps`
-* Adds support for using Pipeline instances as steps
-* `pipelayer.Pipeline` removes factory method, and implements a constructor that takes `filters` and `name` as args
-* `pipelayer.Pipeline.run` method updated to match the signature of the `pipelayer.Filter.run` method
+* Adds support for Pipeline instances as steps
+* `pipelayer.Pipeline` removes factory method, and implements a constructor that takes `steps` and `name` as args
+* `pipelayer.Pipeline.run` and `pipelayer.Filter.run` method signatures updated.
 
 ## 0.2.0 - 1/22/21
 * Adds support for static/module/lamba functions as well as `pipelayer.Filter` types as Pipeline Filters
 * Basic signature validation for filter functions
-* context property in `pipelayer.Filter` is typed as `Union[Context, Any]`
+* context property in `pipelayer.Filter` is typed as `Union[Context]`
 * Handles all exceptions raises by filters and raises a `PipelineException` with the original exception assigned to the `inner_exception` property
 
 ## 0.1.0 - 1/16/2021

@@ -12,23 +12,22 @@ class TestPipeline:
     @pytest.mark.happy
     def test_pipeline_basic(self, app_context):
 
-        def first_filter_preprocess(context, data) -> dict:
+        def first_filter_preprocess(data, context) -> dict:
             return data
 
         class FirstFilter(Filter):
-            def run(self, context, data) -> dict:
+            def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
         steps = [
             FirstFilter(
                 pre_process=first_filter_preprocess,
-                post_process=lambda context, data: json.dumps(data)
+                post_process=lambda data, context: json.dumps(data)
             )
         ]
 
-        context = app_context
         pipeline = Pipeline(steps)
-        response = pipeline.run(context, None)
+        response = pipeline.run(None)
 
         assert pipeline.name == "Pipeline"
         assert pipeline.manifest.name == "Pipeline"
@@ -39,24 +38,23 @@ class TestPipeline:
     @pytest.mark.happy
     def test_nested_pipeline(self, app_context):
 
-        def first_filter_preprocess(context, data) -> dict:
+        def first_filter_preprocess(data, context) -> dict:
             return data
 
         class FirstFilter(Filter):
-            def run(self, context, data) -> dict:
+            def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
         steps = [
             FirstFilter(
                 pre_process=first_filter_preprocess,
-                post_process=lambda context, data: json.dumps(data)
+                post_process=lambda data, context: json.dumps(data)
             )
         ]
 
-        context = app_context
         sub_pipeline = Pipeline(steps, "SubPipeline")
         pipeline = Pipeline([sub_pipeline], "OuterPipeline")
-        response = pipeline.run(context, None)
+        response = pipeline.run(None)
 
         assert pipeline.name == "OuterPipeline"
         assert pipeline.manifest.name == "OuterPipeline"
@@ -69,28 +67,27 @@ class TestPipeline:
         import json
 
         class FirstFilter(Filter):
-            def run(self, context, data) -> dict:
+            def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
-        def second_filter(context, data) -> dict:
+        def second_filter(data, context) -> dict:
             data.update({"something": "got changed"})
             return data
 
         steps = [
             FirstFilter,
             second_filter,
-            lambda context, data: json.dumps(data)
+            lambda data, context: json.dumps(data)
         ]
 
-        context = app_context
         pipeline = Pipeline(steps)
-        response = pipeline.run(context, None)
+        response = pipeline.run(None)
 
         assert pipeline.name == "Pipeline"
         assert pipeline.manifest.name == "Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert pipeline.manifest.steps[1].name == "second_filter"
-        assert pipeline.manifest.steps[2].name == "[lambda context, data: json.dumps(data)]"
+        assert pipeline.manifest.steps[2].name == "[lambda data, context: json.dumps(data)]"
         assert response == '{"something": "got changed"}'
         assert isinstance(pipeline.manifest.__dict__, dict)
 
@@ -103,19 +100,19 @@ class TestPipeline:
     def test_filter_raises_exception(self):
 
         class ExceptionFilter(Filter):
-            def run(self, context, data) -> dict:
+            def run(self, data, context) -> dict:
                 raise FileNotFoundError("This is not the file you're looing for.")
 
         steps = [ExceptionFilter]
         pipeline = Pipeline(steps)
 
         with pytest.raises(PipelineException):
-            pipeline.run(None, None)
+            pipeline.run(None)
 
     @pytest.mark.sad
     def test_pre_process_raises_exception(self):
 
-        def none_type_func(context, data):
+        def none_type_func(data, context):
             raise TypeError("You're not my type.")
 
         steps = [MockFilter(pre_process=none_type_func)]
@@ -124,16 +121,16 @@ class TestPipeline:
         pipeline = Pipeline(steps)
 
         with pytest.raises(PipelineException):
-            pipeline.run(None, None)
+            pipeline.run(None)
 
     @pytest.mark.sad
     def test_post_process_raises_exception(self):
         from pipelayer.util import MockFilter
 
-        def none_type_func(context, data):
+        def none_type_func(data, context):
             raise TypeError("You're not my type either.")
 
         pipeline = Pipeline([MockFilter(post_process=none_type_func)])
 
         with pytest.raises(PipelineException):
-            pipeline.run(None, None)
+            pipeline.run(None)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 from pipelayer.context import Context
 from pipelayer.step import Step
@@ -22,5 +22,5 @@ class Filter(Step):
         return self.__post_process
 
     @abstractmethod
-    def run(self, context: Union[Context, Any], data: Any) -> Any:
+    def run(self, data: Any, context: Context) -> Any:
         raise NotImplementedError

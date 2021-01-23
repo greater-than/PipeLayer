@@ -10,33 +10,32 @@ from pipelayer.filter import Filter
 from pipelayer.final import Final
 from pipelayer.manifest import (Manifest, ManifestEntry, StepManifestEntry,
                                 StepType)
-from pipelayer.settings import Settings  # NOQA F401
 from pipelayer.step import Step
 
 
 class Pipeline(Step):
     def __init__(self: Pipeline,
-                 steps: List[Union[Step, Callable[[Context, Any], Any]]],
+                 steps: List[Union[Step, Callable[[Any, Context], Any]]],
                  name: str = "") -> None:
         super().__init__(name)
-        self.__steps: List[Union[Step, Callable[[Context, Any], Any]]] = steps
+        self.__steps: List[Union[Step, Callable[[Any, Context], Any]]] = steps
         self.__manifest: Manifest = None  # type: ignore
 
     @property
-    def steps(self) -> List[Union[Step, Callable[[Context, Any], Any]]]:
+    def steps(self) -> List[Union[Step, Callable[[Any, Context], Any]]]:
         return self.__steps
 
     @property
     def manifest(self) -> Manifest:
         return self.__manifest
 
-    def run(self, context: Union[Context, Any], data: Any) -> Any:
+    def run(self, data: Any, context: Optional[Context] = None) -> Any:
         """
         The Pipeline runner
         """
-        return self.__run_steps(context, data)[0]
+        return self.__run_steps(data, context)[0]
 
-    def __run_steps(self, context: Union[Context, Any], data: Any) -> Any:
+    def __run_steps(self, data: Any, context: Optional[Context] = None) -> Any:
         self.__initialize_manifest()
 
         for step in [Pipeline.__initialize_step(step) for step in self.steps]:
@@ -48,29 +47,25 @@ class Pipeline(Step):
             )
 
             # pre_process
-            data, manifest_entry.pre_process = self.__run_step_process(pre_process, context, data)
+            data, manifest_entry.pre_process = self.__run_step_process(pre_process, data, context)
 
             # step
             try:
                 if step_type is StepType.PIPELINE:
-                    data, manifest_entry.steps = step_func(context, data)
+                    data, manifest_entry.steps = step_func(data, context)  # type: ignore
                 else:
-                    data = step_func(context, data)
-
+                    data = step_func(data, context)  # type: ignore
             except Exception as e:
                 raise PipelineException(inner_exception=e)
 
             # post_process
-            data, manifest_entry.post_process = self.__run_step_process(post_process, context, data)
+            data, manifest_entry.post_process = self.__run_step_process(post_process, data, context)
 
-            manifest_entry.end = datetime.utcnow()
-            manifest_entry.duration = manifest_entry.end - manifest_entry.start
+            Pipeline.__close_manifest_entry(manifest_entry)
 
             self.manifest.steps.append(manifest_entry)
 
-        end = datetime.utcnow()
-        self.manifest.end = end
-        self.manifest.duration = end - self.manifest.start
+        Pipeline.__close_manifest_entry(self.manifest)
 
         return data, self.manifest
 
@@ -79,14 +74,19 @@ class Pipeline(Step):
             self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
 
     @staticmethod
+    def __close_manifest_entry(manifest_entry: ManifestEntry) -> None:
+        manifest_entry.end = datetime.utcnow()
+        manifest_entry.duration = manifest_entry.end - manifest_entry.start
+
+    @staticmethod
     def __initialize_step(
-        step: Union[Step, Type[Filter], Callable[[Context, Any], Any]]
+        step: Union[Step, Type[Filter], Callable[[Any, Context], Any]]
     ) -> Tuple[
         str,
         StepType,
-        Callable[[Context, Any], Any],
-        Optional[Callable[[Context, Any], Any]],
-        Optional[Callable[[Context, Any], Any]],
+        Callable[[Any, Context], Any],
+        Optional[Callable[[Any, Context], Any]],
+        Optional[Callable[[Any, Context], Any]],
     ]:
         name = ""
         if inspect.isclass(step):
@@ -124,7 +124,9 @@ class Pipeline(Step):
 
     @staticmethod
     def __run_step_process(
-        process: Optional[Callable], context: Union[Context, Any], data: Any
+        process: Optional[Callable],
+        data: Any,
+        context: Optional[Context]
     ) -> Tuple[Any, Optional[ManifestEntry]]:
         """
         The step pre/post process runner
@@ -138,7 +140,7 @@ class Pipeline(Step):
         )
 
         try:
-            data = process(context, data)
+            data = process(data, context)
         except Exception as e:
             raise PipelineException(inner_exception=e)
 

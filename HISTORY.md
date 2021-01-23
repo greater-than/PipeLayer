@@ -1,5 +1,18 @@
 # Version History
 
+## 0.3.0 - 1/30/21
+It's still a beta package, and decided against bumping the version to 1.0.0--despite the breaking changes.
+
+What's New:
+* Nested pipelines
+* Adds a flask microservice example project
+
+BREAKING CHANGES:
+* `pipelayer.Pipeline.filters` renamed to `steps`
+* Adds support for using Pipeline instances as steps
+* `pipelayer.Pipeline` removes factory method, and implements a constructor that takes `filters` and `name` as args
+* `pipelayer.Pipeline.run` method updated to match the signature of the `pipelayer.Filter.run` method
+
 ## 0.2.0 - 1/22/21
 * Adds support for static/module/lamba functions as well as `pipelayer.Filter` types as Pipeline Filters
 * Basic signature validation for filter functions
@@ -8,3 +21,4 @@
 
 ## 0.1.0 - 1/16/2021
 * Pipeline composed of single-method classes that inherit from `pipelayer.Filter`
+* Includes a simple example project.

@@ -8,98 +8,112 @@ from pipelayer.context import Context
 from pipelayer.exception import InvalidFilterException, PipelineException
 from pipelayer.filter import Filter
 from pipelayer.final import Final
-from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
+from pipelayer.manifest import (Manifest, ManifestEntry, StepManifestEntry,
+                                StepType)
 from pipelayer.settings import Settings  # NOQA F401
+from pipelayer.step import Step
 
 
-class Pipeline:
-    __name: str
-    __context: Union[Context, Any]
-    __manifest: Manifest
+class Pipeline(Step):
+    def __init__(self: Pipeline,
+                 steps: List[Union[Step, Callable[[Context, Any], Any]]],
+                 name: str = "") -> None:
+        super().__init__(name)
+        self.__steps: List[Union[Step, Callable[[Context, Any], Any]]] = steps
+        self.__manifest: Manifest = None  # type: ignore
 
     @property
-    def name(self) -> str:
-        return self.__name
-
-    @property
-    def context(self) -> Union[Context, Any]:
-        return self.__context
+    def steps(self) -> List[Union[Step, Callable[[Context, Any], Any]]]:
+        return self.__steps
 
     @property
     def manifest(self) -> Manifest:
         return self.__manifest
 
-    @classmethod
-    def create(cls, context: Union[Context, Any], name: str = "") -> Pipeline:
-        """
-        Pipeline factory
-        """
-        pipeline = Pipeline()
-        pipeline.__name = name or cls.__name__
-        pipeline.__context = context
-        return pipeline
-
-    def run(self, filters: List[Union[Filter, Callable[[Context, Any], Any]]], data: Any = None) -> Any:
+    def run(self, context: Union[Context, Any], data: Any) -> Any:
         """
         The Pipeline runner
         """
-        self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
+        return self.__run_steps(context, data)[0]
 
-        for filter in [Pipeline.__initialize_filter(filter) for filter in filters]:
-            filter_name, filter_func, pre_process, post_process = filter
+    def __run_steps(self, context: Union[Context, Any], data: Any) -> Any:
+        self.__initialize_manifest()
 
-            manifest_entry = FilterManifestEntry(name=filter_name, start=datetime.utcnow())
+        for step in [Pipeline.__initialize_step(step) for step in self.steps]:
+            step_name, step_type, step_func, pre_process, post_process = step
+            manifest_entry = StepManifestEntry(
+                name=step_name,
+                start=datetime.utcnow(),
+                step_type=step_type
+            )
 
             # pre_process
-            try:
-                manifest_entry.pre_process, data = self.__run_filter_process(pre_process, data)
-            except Exception as e:
-                raise PipelineException(inner_exception=e)
+            data, manifest_entry.pre_process = self.__run_step_process(pre_process, context, data)
 
-            # filter
+            # step
             try:
-                data = filter_func(self.context, data)
+                if step_type is StepType.PIPELINE:
+                    data, manifest_entry.steps = step_func(context, data)
+                else:
+                    data = step_func(context, data)
+
             except Exception as e:
                 raise PipelineException(inner_exception=e)
 
             # post_process
-            try:
-                manifest_entry.post_process, data = self.__run_filter_process(post_process, data)
-            except Exception as e:
-                raise PipelineException(inner_exception=e)
+            data, manifest_entry.post_process = self.__run_step_process(post_process, context, data)
 
             manifest_entry.end = datetime.utcnow()
-            manifest_entry.duration = (manifest_entry.end - manifest_entry.start)
+            manifest_entry.duration = manifest_entry.end - manifest_entry.start
 
-            self.manifest.filters.append(manifest_entry)
+            self.manifest.steps.append(manifest_entry)
 
         end = datetime.utcnow()
         self.manifest.end = end
-        self.manifest.duration = (end - self.manifest.start)
+        self.manifest.duration = end - self.manifest.start
 
-        return data
+        return data, self.manifest
+
+    def __initialize_manifest(self) -> None:
+        if not self.__manifest:
+            self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
 
     @staticmethod
-    def __initialize_filter(filter: Union[Filter, Type[Filter], Callable[[Context, Any], Any]]) -> Tuple[
+    def __initialize_step(
+        step: Union[Step, Type[Filter], Callable[[Context, Any], Any]]
+    ) -> Tuple[
         str,
+        StepType,
         Callable[[Context, Any], Any],
         Optional[Callable[[Context, Any], Any]],
-        Optional[Callable[[Context, Any], Any]]
+        Optional[Callable[[Context, Any], Any]],
     ]:
         name = ""
-        if inspect.isclass(filter):
+        if inspect.isclass(step):
             # The checks should have isolated the type, but mypy complains
-            filter = filter(filter.__name__)  # type: ignore
+            step = step(step.__name__)  # type: ignore
 
-        if isinstance(filter, Filter) and issubclass(filter.__class__, Filter):
-            return filter.name, filter.run, filter.pre_process, filter.post_process
+        if isinstance(step, Step) and issubclass(step.__class__, Step):
+            is_filter = issubclass(step.__class__, Filter)
+            is_pipeline = isinstance(step, Pipeline)
+            step_type = StepType.FILTER if is_filter else StepType.PIPELINE
+            func = step.__run_steps if is_pipeline else step.run  # type: ignore
+            pre = step.pre_process if is_filter else None  # type: ignore
+            post = step.post_process if is_filter else None  # type: ignore
+            return step.name, step_type, func, pre, post
 
-        if not Pipeline.__is_callable_valid(filter):
-            raise InvalidFilterException(("Filter functions cannot be 'None' and must have two arguments."))
+        if not Pipeline.__is_callable_valid(step):
+            raise InvalidFilterException(
+                ("Filter functions cannot be 'None' and must have two arguments.")
+            )
 
-        name = f"[{inspect.getsource(filter).strip()}]" if filter.__name__ == "<lambda>" else filter.__name__
+        name = (
+            f"[{inspect.getsource(step).strip()}]"
+            if step.__name__ == "<lambda>"
+            else step.__name__
+        )
 
-        return name, filter, None, None
+        return name, StepType.FUNCTION, step, None, None
 
     @staticmethod
     def __is_callable_valid(obj: Callable[..., Any]) -> bool:
@@ -108,20 +122,31 @@ class Pipeline:
         sig = inspect.signature(obj)
         return len(sig.parameters) == 2
 
-    def __run_filter_process(self, process: Optional[Callable], data: Any) -> Tuple[Optional[ManifestEntry], Any]:
+    @staticmethod
+    def __run_step_process(
+        process: Optional[Callable], context: Union[Context, Any], data: Any
+    ) -> Tuple[Any, Optional[ManifestEntry]]:
         """
-        The filter pre/post process runner
+        The step pre/post process runner
         """
         if not process:
-            return None, data
+            return data, None
 
-        process_manifest_entry = ManifestEntry(name=process.__name__, start=datetime.utcnow())
+        process_manifest_entry = ManifestEntry(
+            name=process.__name__,
+            start=datetime.utcnow()
+        )
 
-        data = process(self.context, data)
+        try:
+            data = process(context, data)
+        except Exception as e:
+            raise PipelineException(inner_exception=e)
 
         process_manifest_entry.end = datetime.utcnow()
-        process_manifest_entry.duration = (process_manifest_entry.end - process_manifest_entry.start)
+        process_manifest_entry.duration = (
+            process_manifest_entry.end - process_manifest_entry.start
+        )
 
-        return process_manifest_entry, data
+        return data, process_manifest_entry
 
     __metaclass__ = Final

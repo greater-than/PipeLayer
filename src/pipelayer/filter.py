@@ -1,20 +1,17 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any, Callable, Optional, Union
 
 from pipelayer.context import Context
+from pipelayer.step import Step
 
 
-class Filter(ABC):
+class Filter(Step):
     def __init__(self: Filter, name: str = "", pre_process: Callable = None, post_process: Callable = None) -> None:
-        self.__name = name or self.__class__.__name__
+        super().__init__(name)
         self.__pre_process = pre_process
         self.__post_process = post_process
-
-    @property
-    def name(self) -> str:
-        return self.__name
 
     @property
     def pre_process(self) -> Optional[Callable]:

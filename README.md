@@ -1,5 +1,5 @@
 # PipeLayer
-PipeLayer is a lightweight Python pipeline framework. Define a series of filters, and chain them together to create modular applications.
+PipeLayer is a lightweight Python pipeline framework. Define a series of steps, and chain them together to create modular applications.
 <br>
 
 ### Table of Contents
@@ -7,8 +7,6 @@ PipeLayer is a lightweight Python pipeline framework. Define a series of filters
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [The Framework](#the-framework)
-* _[VERSION HISTORY](HISTORY.md)_
-* _[LICENSE](LICENSE.txt)_
 <br><br>
 
 ## Installation
@@ -21,7 +19,7 @@ pip install pipelayer
 ## Getting Started
 
 ### Step 1: Application Settings
-Create a class called AppSettings that inherits from [`pipelayer.Settings`](Settings):
+Create a class called AppSettings that inherits from [`pipelayer.Settings`](#pipelayersettings):
 
 `app_settings.py`
 ```python
@@ -64,10 +62,6 @@ class AppContext(Context):
 ```
 
 ### Step 3: Create Pipeline Filters
-Filters can be defined in the following ways:
-* Classes that inherits from `pipelayer.Filter` and implement the `run` method
-* Functions (instance/class/static/module) that have the following signature `func(context: Any, data: Any)`
-* Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions: `my_func = lambda context, data: data`
 
 `hello_world_filters.py`
 ```python
@@ -126,48 +120,50 @@ from the command line:
 ```sh
 run app.py
 ```
+
 ---
 
 ## The Framework
-* [Pipeline](#pipelayer.pipeline)
-* [Filter](#pipelayer.filter)
-* [Context](#pipelayer.context)
-* [Settings](#pipelayer.settings)
-* [Manifest](#pipelayer.manifest)
+* [Pipeline](#pipelayerpipeline)
+* [Filter](#pipelayerfilter)
+* [Context](#pipelayercontext)
+* [Settings](#pipelayersettings)
+* [Manifest](#pipelayermanifest)
 * [Utilities](#utilities)
 <br><br>
 
 
-### __`pipelayer.Pipeline`__
+### __`pipelayer.Pipeline(`[`Step`](#pipelayerstep)`)`__
+
+***Constructor***
+
+__`__init__(self: Pipeline, steps: List[Union[Step, Callable[[Context, Any], Any]]] = None, name: str = "")`__<br>
+The type hints for the steps arg looks confusing. Here's what's allowed:
+
+- Instances of the derive from `pipelayer.Filter` and implement the `run` method
+- Functions (instance/class/static/module) that have the following signature `func(context: Any, data: Any)`
+- Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions: `my_func = lambda context, data: data`
+- **Instances of [`pipelayer.Pipeline`](#pipelayer.Pipeline) (new in v0.3.0)**
 
 ***Properties***
 
-__`name`__ (str)<br>
-An optional name. It's used in the `Manifest`.
-
-__`context`__ (Context)<br>
-An instance of `pipelayer.Context`.
-
 __`manifest`__ (Manifest)<br>
-An instance of `pipelayer.Manifest` that is created at runtime.
+An instance of [`pipelayer.Manifest`](#pipelayermanifest) that is created when the run method is called.
 
 ***Methods***
 
-__`create(context: Union[Context, Any], name: str = "") -> Pipeline`__<br>
-The factory method to create a pipeline
-
-__`run(filters: List[Filter], data: Any = None) -> Any`__<br>
-The pipeline runner that iterates through the `filters` and pipes filter output to the next filter.
+__`run(context: Union[`[`Context`](#pipelayercontext)`, Any], data: Any) -> Any`__<br>
+The pipeline runner that iterates through the `steps` and pipes filter output to the next step.
 <br><br>
 
 
-### __`pipelayer.Filter`__
-A functional unit that implements the `run` method, and the optional `pre_process` and `post_process` methods.
+### __`pipelayer.Filter(Step)`__
+A base class with an abstract `run` method, and the optional `pre_process` and `post_process` methods.
 
 ***Properties***
 
 __`name`__ (str)<br>
-Optional. Used by the [`Manifest`](#pipelayer.manifest)
+Optional. Used by the [`Manifest`](#pipelayermanifest)
 
 __`pre_process`__ (callable)<br>
 Optional.
@@ -177,8 +173,18 @@ Optional.
 
 ***Methods***
 
-__`run(context: Union[Context, Any], data: Any) -> Any`__<br>
+__`run(context: Union[`[`Context`](#pipelayercontext)`, Any], data: Any) -> Any`__<br>
 The type of the `data` argument in the abstract class is `Any`, but you can use the correct type for the data when implementing method. The same is true for the return type.
+<br><br>
+
+
+### __`pipelayer.Step`__
+The base class for `[pipelayer.Pipeline](#pipelayerpipeline)` and `[pipelayer.Filter](#pipelayerfilter)`.
+
+***Properties***
+
+__`name`__ (str)<br>
+Optional. Used by the Manifest
 <br><br>
 
 
@@ -187,13 +193,13 @@ The Context object is used to pass application-level information to each filter.
 
 ***Properties***
 
-__[`settings`](#settings)__ (Any)<br>
+__[`settings`](#pipelayersettings)__ (Any)<br>
 An optional abstract property for storing application-level data.
 
 __`log`__ (Any)<br>
 An optional abstract property for a common logger that can be used within pipeline filters.
 
-__[`manifest`](#manifest)__ (Manifest)<br>
+__[`manifest`](#pipelayermanifest)__ (Manifest)<br>
 A model that keeps a record of start/stop times for a pipeline, as well as each filter.
 <br><br>
 
@@ -204,7 +210,7 @@ The settings class is an optional base class for applications settings that inhe
 
 
 ### __`pipelayer.Manifest`__
-The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) activity.
+The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#pipelayerfilter) activity.
 
 
 ### Utilities

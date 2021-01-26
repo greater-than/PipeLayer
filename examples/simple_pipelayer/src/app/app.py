@@ -6,11 +6,10 @@
 import json
 from typing import Any, Tuple
 
-from pipelayer import Pipeline
-
 from app.filter.create_response import create_response
 from app.filter.hello_filter import HelloFilter
 from app.filter.world_filter import WorldFilter
+from pipelayer import Pipeline
 
 # endregion
 

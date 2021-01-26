@@ -50,7 +50,7 @@ class Pipeline(Step):
             data, manifest_entry.pre_process = self.__run_step_process(pre_process, data, context)
 
             # step
-            try:
+            try:  # TODO Is the try/except necessary?
                 if step_type is StepType.PIPELINE:
                     data, manifest_entry.steps = step_func(data, context)  # type: ignore
                 else:

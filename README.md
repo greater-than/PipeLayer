@@ -93,8 +93,8 @@ run app.py
 __`__init__(self: Pipeline, steps: List[Union[Step, Callable[Any, [Context]]]] = None, name: str = "")`__<br>
 The type hints for the `steps` arg may look confusing. Here's what's allowed:
 
-- Instances of the derive from `pipelayer.Filter` and implement the `run` method
-- Functions (instance/class/static/module) that have the following signature `func(context: Any, data: Any)`
+- Classes and Instances that derive from `pipelayer.Filter` and implement the `run` method
+- Functions (instance/class/static/module) that have the following signature `func(data: Any, context: Any)`
 - Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions: `my_func = lambda data, context: data`
 - **Instances of [`pipelayer.Pipeline`](#pipelayer.Pipeline) (new in v0.3.0)**
 

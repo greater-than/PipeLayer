@@ -115,15 +115,6 @@ function Install_Requirements {
     }
 }
 
-function Install_Tools {
-    if (-Not(Test-Path -Path ".tools" -PathType Container)) {
-        New-Item -Name ".tools" -ItemType Directory
-    }
-    Write_Banner "Installing NuGet"
-    Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -Outfile .tools\nuget.exe
-    .tools\nuget.exe install GitVersion.CommandLine -Version 5.3.7 -outputdirectory .tools
-}
-
 function Install_Poetry {
     try {
         if (-Not(Get-Command -Name "poetry")) {

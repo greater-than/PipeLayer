@@ -1,0 +1,7 @@
+[flake8]
+exclude = .git,__pycache__,*.venv,*venv,*build,*dist
+max-line-length = 120
+inline-quotes = double
+include = src
+extend-exclude = venv
+max-complexity = 10

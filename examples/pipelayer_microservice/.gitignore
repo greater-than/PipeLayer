@@ -1,0 +1,25 @@
+# project folders
+.build
+build
+dist
+*.egg-info
+
+# test
+*.test_results
+*-test-results.xml
+.coverage
+
+.tools*
+.venv*
+
+# vscode
+*.code-workspace
+.vscode
+
+# python
+.mypy_cache
+.pytest_cache
+__pycache__
+*.py[co]
+
+FUTURE.md

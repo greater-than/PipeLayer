@@ -8,15 +8,15 @@ class Support(BaseModel):
     text: Optional[str]
 
 
-class ResReqBaseResponse(BaseModel):
+class ResReqBase(BaseModel):
     support: Support
 
 
-class ResReqSingleResponse(ResReqBaseResponse):
+class ResReqModel(ResReqBase):
     data: dict
 
 
-class ResReqListResponse(ResReqBaseResponse):
+class ResReqList(ResReqBase):
     page: int
     per_page: int
     total: int

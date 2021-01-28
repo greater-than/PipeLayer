@@ -3,49 +3,37 @@ import json
 import requests
 
 from service.config import AppContext
-from service.model.request_model import ListRequest, UsersRequest
-from service.model.resreq_model import ResReqSingleResponse
+from service.model.request_model import (ListRequest, UserListRequest,
+                                         UserRequest, UserSearchRequest)
 
 
 class ResReq:
 
     @staticmethod
-    def get_user(id: int, context: AppContext) -> ResReqSingleResponse:
-        req = f"{context.settings.resreq_api}/users/{id}"
+    def get_user(request: UserRequest, context: AppContext) -> dict:
+        req = f"{context.settings.resreq_api}/{request.api_name}/{request.id}"
         resreq_resp = requests.get(req)
-        resp = json.loads(resreq_resp.content)
+        user = json.loads(resreq_resp.content)
         context.log.info("User received from ResReq")
-        return resp
+        return user
 
     @staticmethod
-    def get_paged_users(request: ListRequest, context: AppContext) -> dict:
-        req = f"{context.settings.resreq_api}/users?page={request.page}&per_page={request.per_page}"
-        resreq_resp = requests.get(req)
-        resp = json.loads(resreq_resp.content)
+    def get_users(request: UserListRequest, context: AppContext) -> dict:
+        users = ResReq.get_resreq_list(request, context)
         context.log.info("Users received from ResReq")
-        return resp
+        return users
 
     @staticmethod
-    def get_users(request: UsersRequest, context: AppContext) -> dict:
-        page = request.page
-        resp = {}
-        while page <= request.max_pages:
-            req = f"{context.settings.resreq_api}/users?page={page}&per_page={request.per_page}"
-            resreq_resp = requests.get(req)
-            content = json.loads(resreq_resp.content)
-            page += 1
-            if not resp:
-                resp = content
-            else:
-                resp["page"] = page
-                resp["data"].append(content["data"])
+    def find_users(request: UserSearchRequest, context: AppContext) -> dict:
+        users = ResReq.get_resreq_list(request, context)
 
-        context.log.info("Users received from ResReq")
-        return resp
+        total = users["total"]
+        items_remaining = total - (len(users["data"]) * request.per_page)
 
-    @staticmethod
-    def find_users(request: UsersRequest, context: AppContext) -> dict:
-        users = ResReq.get_users(request, context)
+        if request.search_all and items_remaining > 0:
+            remaining_items_request = ListRequest(page=request.page + 1, per_page=items_remaining)
+            users["data"].append(ResReq.get_resreq_users(remaining_items_request, context)["data"])
+
         users["data"] = [
             user for user in users["data"]
             if request.email in user["email"] and
@@ -53,3 +41,11 @@ class ResReq:
             request.last_name in user["last_name"] and
             request["avatar"] in user["avatar"]
         ]
+
+        return users
+
+    @staticmethod
+    def get_resreq_list(request: ListRequest, context: AppContext) -> dict:
+        req = f"{context.settings.resreq_api}/{request.api_name}?page={request.page}&per_page={request.per_page}"
+        resreq_resp = requests.get(req)
+        return json.loads(resreq_resp.content)

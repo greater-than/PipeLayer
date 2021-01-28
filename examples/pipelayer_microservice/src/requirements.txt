@@ -1,4 +1,4 @@
 flask
 connexion[swagger-ui]
-# pipelayer~=0.3.0
+pipelayer~=0.3.0
 requests

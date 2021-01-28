@@ -1,12 +1,18 @@
-from service.model.request_model import UserRequest, UsersRequest
+from service.config.app_context import AppContext
+from service.model.request_model import (UserListRequest, UserRequest,
+                                         UserSearchRequest)
 
 
 class MapRequest:
 
     @staticmethod
-    def from_users_request(request: dict) -> UsersRequest:
-        return UsersRequest(**request)
+    def from_get_user_request(request: dict, context: AppContext) -> UserRequest:
+        return UserRequest(**request)
 
     @staticmethod
-    def from_user_request(request: dict) -> UserRequest:
-        return UserRequest(**request)
+    def from_get_users_request(request: dict, context: AppContext) -> UserListRequest:
+        return UserListRequest(**request)
+
+    @staticmethod
+    def from_find_user_request(request: dict, context: AppContext) -> UserSearchRequest:
+        return UserSearchRequest(**request)

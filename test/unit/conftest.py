@@ -2,6 +2,7 @@ from test.fixtures.app_context import AppContext
 from test.fixtures.manifest import manifest_dict
 
 import pytest
+
 from pipelayer import Manifest
 
 

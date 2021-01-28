@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from pipelayer import Filter, Pipeline
 from pipelayer.exception import InvalidFilterException, PipelineException
 from pipelayer.util import MockFilter

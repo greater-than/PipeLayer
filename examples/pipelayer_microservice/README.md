@@ -1,6 +1,10 @@
 # PipeLayer MicroService Example
 A real connexion (flask) microservice that makes calls to a 3rd-party API to return user data.
 
+### Table of Contents
+* [Running The Service](#running-the-service)
+  * [Debugging The Service](#debugging-the-service)
+
 ## Running The Service
 
 Open a terminal and navigate to the project root directory.
@@ -25,9 +29,7 @@ Note: If localhost is not mapped your local IP, try replacing 'localhost' with '
 If everything is working you should see a page with the Swagger UI.
 <br><br>
 
----
-
-## Running The Service with The Debugger
+### Debugging The Service
 If you're using VSCode and want to run the service with a debugger, open the workspace file found in the root directory of the project.
 
 Hit `F5` or select `Start Debugging` from the `Run` menu.<br>

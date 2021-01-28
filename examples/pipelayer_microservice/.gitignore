@@ -13,7 +13,6 @@ dist
 .venv*
 
 # vscode
-*.code-workspace
 .vscode
 
 # python

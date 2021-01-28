@@ -1,6 +1,4 @@
-from typing import Callable, Union
-
-from pipelayer import Pipeline, Step
+from pipelayer import Pipeline
 from service.filter.mapper.map_request_filter import MapRequest
 from service.filter.mapper.map_resreq_filter import MapResReq
 from service.filter.mapper.map_user_filter import MapUser
@@ -9,27 +7,29 @@ from service.filter.resreq_filter import ResReq
 get_user_pipeline: Pipeline = Pipeline(
     name="Get User Pipeline",
     steps=[
+        MapRequest.from_get_user_request,
         ResReq.get_user,
-        MapResReq.from_single_response,
-        MapUser.from_resreq_single_response
+        MapResReq.from_resreq_api_response,
+        MapUser.from_resreq_model
     ]
 )
 
 
-def users_pipeline(get_users_step: Union[Step, Callable]) -> Pipeline:
-    return Pipeline(
-        name="Get Users Pipeline",
-        steps=[
-            MapRequest.from_users_request,
-            get_users_step,
-            MapResReq.from_list_response,
-            MapUser.from_resreq_list_response
-        ]
-    )
+get_users_pipeline: Pipeline = Pipeline(
+    steps=[
+        MapRequest.from_get_users_request,
+        ResReq.get_users,
+        MapResReq.from_resreq_list_api_response,
+        MapUser.from_resreq_list
+    ]
+)
 
 
-get_paged_users_pipeline: Pipeline = users_pipeline(ResReq.get_paged_users)
-
-get_all_users_pipeline: Pipeline = users_pipeline(ResReq.get_users)
-
-find_users_pipeline: Pipeline = users_pipeline(ResReq.find_users)
+find_users_pipeline: Pipeline = Pipeline(
+    steps=[
+        MapRequest.from_find_user_request,
+        ResReq.find_users,
+        MapResReq.from_resreq_list_api_response,
+        MapUser.from_resreq_list
+    ]
+)

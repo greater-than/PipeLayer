@@ -1,10 +1,6 @@
 # PipeLayer MicroService Example
 A real connexion (flask) microservice that makes calls to a 3rd-party API to return user data.
 
-### Table of Contents
-* [Running The Service](#running-the-service)
-  * [Debugging The Service](#debugging-the-service)
-
 ## Running The Service
 
 Open a terminal and navigate to the project root directory.
@@ -21,7 +17,7 @@ Start the service:
 ```
 python .\run.py
 ```
-And Now open this link in a browser:<br>
+Open this link in a browser:<br>
 http://localhost/v1/ui<br>
 
 Note: If localhost is not mapped your local IP, try replacing 'localhost' with '127.0.0.1'

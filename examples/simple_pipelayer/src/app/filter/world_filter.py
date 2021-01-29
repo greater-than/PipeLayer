@@ -1,6 +1,5 @@
-from pipelayer import Filter
-
 from app.app_context import AppContext
+from pipelayer import Filter
 
 
 class WorldFilter(Filter):

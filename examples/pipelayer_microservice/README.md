@@ -1,5 +1,5 @@
 # PipeLayer MicroService Example
-A real connexion (flask) microservice that makes calls to a 3rd-party API to return user data.
+A connexion (flask) microservice that makes calls to a 3rd-party API to return user data.
 
 ## Running The Service
 

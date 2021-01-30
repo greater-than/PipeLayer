@@ -96,83 +96,101 @@ run app.py
 
 <div id="pipeline"></div>
 
-### __`pipelayer.Pipeline(`[`Step`](#step)`)`__
+### __`pipelayer.Pipeline(Step)`__
+__`__init__(steps, name)`__
 
-***Constructor***
+*args:*
 
-__`__init__(self: Pipeline, steps: List[Union[Step, Callable[Any, [Context]]]] = None, name: str = "")`__<br>
-The type hints for the `steps` arg may look confusing. Here's what's allowed:
+- `steps: List[Union[Step, Callable[[Any, Context], Any]]]`<br>
+A list of:
+  - Classes and Instances that derive from `pipelayer.Filter` and implement the `run` method
+  - Functions (instance/class/static/module) that have the following signature
 
-- Classes and Instances that derive from `pipelayer.Filter` and implement the `run` method
-- Functions (instance/class/static/module) that have the following signature
+    ```python
+    def func(data: Any, context: Any)
+    ```
 
-  ```python
-  def func(data: Any, context: Any)
-  ```
+  - Anonymous functions (lambda) with two arguments that follow the same pattern:
 
-- Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions:
+    ```python
+    my_func = lambda data, context: data
+    ```
 
-  ```python
-  my_func = lambda data, context: data
-  ```
+  - **Instances of `pipelayer.Pipeline` (new in v0.3.0)**
 
-- **Instances of `pipelayer.Pipeline` (new in v0.3.0)**
+- `name: Optional[str]`<br>
+   If not specified, the class name will be used.
 
-***Properties***
+***Properties:***
 
-__`manifest`__ (Manifest)<br>
+__`manifest: Manifest`__<br>
 An instance of [`pipelayer.Manifest`](#manifest) that is created when the run method is called.
 
-***Methods***
+***Methods:***
 
-__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
+__`run(data, context) -> Any`__<br>
 The pipeline runner that iterates through the `steps` and pipes filter output to the next step.
+
+*args:*
+
+- `data: Any`
+- `context: pipelayer.Context`
 <br><br>
 
 
 <div id="filter"></div>
 
-### __`pipelayer.Filter(`[`Step`](#step)`)`__
-A base class with an abstract `run` method.
+### __`pipelayer.Filter(Step)`__
+___`__init__(name, pre_process, post_process)`___
 
-***Properties***
+*args:*
+- `name: Optional[str]`<br>
+   If not specified, the class name will be used.
+- `pre_process: Optional[Callable[[Any, Context], Any]`
+- `post_process: Optional[Callable[[Any, Context], Any]`
 
-__`pre_process`__ (callable)<br>
-Optional.
 
-__`post_process`__ (callable)<br>
-Optional.
+***Properties:***
 
-***Methods***
-
-__`@abstractmethod`__<br>
-__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
-The abstract filter runner.
+__`pre_process: Optional[Callable[[Any, Context], Any]`__<br>
+__`post_process: Optional[Callable[[Any, Context], Any]`__
 <br><br>
 
 
 <div id="step"></div>
 
 ### __`pipelayer.Step`__
-The base class that is sub-classed by [`pipelayer.Pipeline`](#pipeline) and [`pipelayer.Filter`](#filter).
+__`__init__(name)`__
 
-***Abstract Methods***
+*args:*
+- `name: Optional[str]`<br>
+   If not specified, the class name will be used.
 
-__`@abstractmethod`__<br>
-__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
-The abstract
+***Properties:***
 
-***Properties***
+__`name: str`__<br>
+The name of the step
 
-__`name`__ (str)<br>
-Optional. Used by the Manifest
+***Abstract Methods:***
+
+__`run(data, context) -> Any`__<br>
+
+*args:*
+
+- `data: Any`
+- `context: pipelayer.Context`
+
+***Properties:***
+
+__`name: str`__<br>
+Optional. Used by the Manifest.
 <br><br>
 
 
 <div id="context"></div>
 
 ### __`pipelayer.Context`__
-A extensible base class for runtime app config.
+A abstract base class for runtime app config.
 <br><br>
 
 
@@ -184,6 +202,12 @@ The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) a
 
 ### Utilities
 
-__`pipelayer.util.render_manifest(manifest: Manifest, indent: int = 2) -> str`__<br>
+__`pipelayer.util.render_manifest(manifest, indent) -> str`__<br>
 Static function that renders formatted JSON data
+
+*args:*
+
+- `manifest: Manifest`
+- `indent: Optional[int]`<br>
+  Default value is 2.
 

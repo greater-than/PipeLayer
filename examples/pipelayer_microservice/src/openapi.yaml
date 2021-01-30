@@ -1,0 +1,184 @@
+openapi: 3.0.3
+
+info:
+  title: PipeLayer MicroService Example
+  description: Retrieves data from the ResReq API and returns JSON data.
+  version: v1.0.0
+
+servers:
+  - url: /v1
+
+paths:
+  /user/{id}:
+    get:
+      operationId: service.api.user.get
+      tags:
+        - Get User
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        200:
+          description: Get User Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+        400:
+          description: Error getting User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/400-Error"
+        500:
+          description: Application Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500-Error"
+  /user:
+    get:
+      operationId: service.api.user.get_users
+      tags:
+        - Get Users
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/perPage"
+      responses:
+        200:
+          description: Get Users Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersModel"
+
+        400:
+          description: Error getting Users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/400-Error"
+        500:
+          description: Application Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500-Error"
+
+components:
+  parameters:
+    id:
+        name: id
+        description: An id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+    page:
+        name: page
+        description: The page number for lists
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 1
+    perPage:
+        name: per_page
+        description: The number of records to return per page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 5
+          example: 5
+
+  schemas:
+  # REQUEST SCHEMAS
+    UsersRequest:
+      additionalProperties: false
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        email:
+          $ref: "#/components/schemas/email"
+        firstName:
+          $ref: "#/components/schemas/firstName"
+        lastName:
+          $ref: "#/components/schemas/lastName"
+        avatar:
+          $ref: "#/components/schemas/avatar"
+
+    # ERROR SCHEMAS
+    500-Error:
+      properties:
+        detail:
+          example: Houston we have a problem
+          type: string
+        status:
+          example: 500
+          type: string
+        title:
+          example: Server Error
+          type: string
+      type: object
+
+    400-Error:
+      properties:
+        detail:
+          example: Bad Request
+          type: string
+        status:
+          example: 400
+          type: string
+        title:
+          example: Bad Request
+          type: string
+      type: object
+
+    # MODELS
+    UsersModel:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#components/schemas/UserModel"
+        manifest:
+          type: object
+
+    UserModel:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        email:
+          $ref: "#/components/schemas/email"
+        firstName:
+          $ref: "#/components/schemas/firstName"
+        lastName:
+          $ref: "#/components/schemas/lastName"
+        avatar:
+          $ref: "#/components/schemas/avatar"
+
+    # FIELDS
+    id:
+      type: integer
+
+    email:
+      type: string
+
+    firstName:
+      type: string
+
+    lastName:
+      type: string
+
+    avatar:
+      type: string
+
+    manifest:
+      type: object

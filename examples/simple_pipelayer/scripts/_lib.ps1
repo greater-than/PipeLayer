@@ -75,7 +75,7 @@ function Setup_Venv {
         }
 
         Write_Banner "Create Virtual Environment: $venvName"
-        $arguments = "-m virtualenv $venvName --pip=20.3.3 --download"
+        $arguments = "-m virtualenv $venvName --pip=21.0.0 --download"
         Execute_Command "python" $arguments
 
         Activate_Venv $venvName
@@ -113,15 +113,6 @@ function Install_Requirements {
         Write-Host "##vso[task.complete result=failed]"
         throw
     }
-}
-
-function Install_Tools {
-    if (-Not(Test-Path -Path ".tools" -PathType Container)) {
-        New-Item -Name ".tools" -ItemType Directory
-    }
-    Write_Banner "Installing NuGet"
-    Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -Outfile .tools\nuget.exe
-    .tools\nuget.exe install GitVersion.CommandLine -Version 5.3.7 -outputdirectory .tools
 }
 
 function Install_Poetry {

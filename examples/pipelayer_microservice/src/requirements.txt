@@ -1,0 +1,5 @@
+flask
+connexion[swagger-ui]
+pipelayer~=0.3.0
+stringbender~=0.2.0
+requests

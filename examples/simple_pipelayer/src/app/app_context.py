@@ -1,8 +1,7 @@
 from logging import Logger
 
-from pipelayer import Context
-
 from app.app_settings import AppSettings
+from pipelayer import Context
 
 
 class AppContext(Context):

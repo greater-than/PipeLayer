@@ -184,6 +184,6 @@ The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) a
 
 ### Utilities
 
-__`pipelayer.util.render_manifest(manifest: Manifest, indent: int = 2) -> str`__
+__`pipelayer.util.render_manifest(manifest: Manifest, indent: int = 2) -> str`__<br>
 Static function that renders formatted JSON data
 

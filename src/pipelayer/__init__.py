@@ -5,9 +5,8 @@ from datetime import datetime
 from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 from pipelayer.context import Context
-from pipelayer.exception import InvalidFilterException, PipelineException
+from pipelayer.exception import InvalidFilterException
 from pipelayer.filter import Filter
-from pipelayer.final import Final
 from pipelayer.manifest import (Manifest, ManifestEntry, StepManifestEntry,
                                 StepType)
 from pipelayer.step import Step
@@ -20,6 +19,9 @@ class Pipeline(Step):
         super().__init__(name)
         self.__steps: List[Union[Step, Callable[[Any, Context], Any]]] = steps
         self.__manifest: Manifest = None  # type: ignore
+
+    def __init_subclass__(cls, **kwargs: Any):
+        raise TypeError(f"type '{Pipeline.__name__}' is not an acceptable base type")
 
     @property
     def steps(self) -> List[Union[Step, Callable[[Any, Context], Any]]]:
@@ -38,40 +40,46 @@ class Pipeline(Step):
     def __run_steps(self, data: Any, context: Optional[Context] = None) -> Any:
         self.__initialize_manifest()
 
-        for step in [Pipeline.__initialize_step(step) for step in self.steps]:
-            step_name, step_type, step_func, pre_process, post_process = step
-            manifest_entry = StepManifestEntry(
-                name=step_name,
-                start=datetime.utcnow(),
-                step_type=step_type
-            )
+        add_manifest_entry = self.manifest.steps.append
+        create_step_manifest_entry = Pipeline.__create_step_manifest_entry
+        close_manifest_entry = Pipeline.__close_manifest_entry
+        initialize_step = Pipeline.__initialize_step
+        run_step_process = Pipeline.__run_step_process
+
+        for step_name, step_type, step_func, pre_process, post_process in map(initialize_step, self.steps):
+            manifest_entry = create_step_manifest_entry(step_name, step_type)
 
             # pre_process
-            data, manifest_entry.pre_process = self.__run_step_process(pre_process, data, context)
+            data, manifest_entry.pre_process = run_step_process(pre_process, data, context)
 
             # step
-            try:  # TODO Is the try/except necessary?
-                if step_type is StepType.PIPELINE:
-                    data, manifest_entry.steps = step_func(data, context)  # type: ignore
-                else:
-                    data = step_func(data, context)  # type: ignore
-            except Exception as e:
-                raise PipelineException(inner_exception=e)
+            if step_type is StepType.PIPELINE:
+                data, manifest_entry.steps = step_func(data, context)  # type: ignore
+            else:
+                data = step_func(data, context)  # type: ignore
 
             # post_process
-            data, manifest_entry.post_process = self.__run_step_process(post_process, data, context)
+            data, manifest_entry.post_process = run_step_process(post_process, data, context)
 
-            Pipeline.__close_manifest_entry(manifest_entry)
+            close_manifest_entry(manifest_entry)
 
-            self.manifest.steps.append(manifest_entry)
+            add_manifest_entry(manifest_entry)
 
-        Pipeline.__close_manifest_entry(self.manifest)
+        close_manifest_entry(self.manifest)
 
         return data, self.manifest
 
     def __initialize_manifest(self) -> None:
         if not self.__manifest:
             self.__manifest = Manifest(name=self.name, start=datetime.utcnow())
+
+    @staticmethod
+    def __create_step_manifest_entry(step_name: str, step_type: StepType) -> StepManifestEntry:
+        return StepManifestEntry(
+            name=step_name,
+            start=datetime.utcnow(),
+            step_type=step_type
+        )
 
     @staticmethod
     def __close_manifest_entry(manifest_entry: ManifestEntry) -> None:
@@ -108,7 +116,7 @@ class Pipeline(Step):
             )
 
         name = (
-            f"[{inspect.getsource(step).strip()}]"
+            f"<{inspect.getsource(step).strip()}>"
             if step.__name__ == "<lambda>"
             else step.__name__
         )
@@ -139,10 +147,7 @@ class Pipeline(Step):
             start=datetime.utcnow()
         )
 
-        try:
-            data = process(data, context)
-        except Exception as e:
-            raise PipelineException(inner_exception=e)
+        data = process(data, context)
 
         process_manifest_entry.end = datetime.utcnow()
         process_manifest_entry.duration = (
@@ -150,5 +155,3 @@ class Pipeline(Step):
         )
 
         return data, process_manifest_entry
-
-    __metaclass__ = Final

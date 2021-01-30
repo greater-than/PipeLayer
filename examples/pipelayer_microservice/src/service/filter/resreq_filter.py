@@ -1,7 +1,6 @@
 import json
 
 import requests
-
 from service.config import AppContext
 from service.model.request_model import (ListRequest, UserListRequest,
                                          UserRequest, UserSearchRequest)
@@ -42,6 +41,7 @@ class ResReq:
             request["avatar"] in user["avatar"]
         ]
 
+        context.log.info("Users received from ResReq")
         return users
 
     @staticmethod

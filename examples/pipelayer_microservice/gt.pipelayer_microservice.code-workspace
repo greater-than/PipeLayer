@@ -39,13 +39,6 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Python: Run Service",
-                "type": "python",
-                "request": "launch",
-                "program": "./src/run.py",
-                "console": "integratedTerminal"
-            },
-            {
                 "name": "Python: Debug Service",
                 "type": "python",
                 "request": "launch",

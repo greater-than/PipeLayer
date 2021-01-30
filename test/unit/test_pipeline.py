@@ -1,9 +1,8 @@
 import json
 
 import pytest
-
 from pipelayer import Filter, Pipeline
-from pipelayer.exception import InvalidFilterException, PipelineException
+from pipelayer.exception import InvalidFilterException
 from pipelayer.util import MockFilter
 
 
@@ -88,7 +87,7 @@ class TestPipeline:
         assert pipeline.manifest.name == "Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert pipeline.manifest.steps[1].name == "second_filter"
-        assert pipeline.manifest.steps[2].name == "[lambda data, context: json.dumps(data)]"
+        assert pipeline.manifest.steps[2].name == "<lambda data, context: json.dumps(data)>"
         assert response == '{"something": "got changed"}'
         assert isinstance(pipeline.manifest.__dict__, dict)
 
@@ -107,7 +106,7 @@ class TestPipeline:
         steps = [ExceptionFilter]
         pipeline = Pipeline(steps)
 
-        with pytest.raises(PipelineException):
+        with pytest.raises(FileNotFoundError):
             pipeline.run(None)
 
     @pytest.mark.sad
@@ -121,7 +120,7 @@ class TestPipeline:
 
         pipeline = Pipeline(steps)
 
-        with pytest.raises(PipelineException):
+        with pytest.raises(TypeError):
             pipeline.run(None)
 
     @pytest.mark.sad
@@ -133,5 +132,5 @@ class TestPipeline:
 
         pipeline = Pipeline([MockFilter(post_process=none_type_func)])
 
-        with pytest.raises(PipelineException):
+        with pytest.raises(TypeError):
             pipeline.run(None)

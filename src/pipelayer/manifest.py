@@ -19,6 +19,7 @@ class ManifestEntry(BaseModel):
     duration: Optional[timedelta]
 
     class Config:
+        use_enum_values = True
         json_encoders = {
             datetime: lambda dt: dt.timestamp(),
             timedelta: timedelta_isoformat,

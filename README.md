@@ -4,10 +4,13 @@ PipeLayer is a lightweight Python pipeline framework. Define a series of steps, 
 
 ### Table of Contents
 
-* [Installation](#installation)
-* [Getting Started](#getting-started)
-* [The Framework](#the-framework)
+* [Installation](#install)
+* [Getting Started](#get-started)
+* [The Framework](#framework)
 <br><br>
+
+
+<div id="install"></div>
 
 ## Installation
 
@@ -15,6 +18,9 @@ From the command line:
 ```sh
 pip install pipelayer
 ```
+
+
+<div id="get-started"></div>
 
 ## Getting Started
 
@@ -26,18 +32,18 @@ from pipelayer import Filter
 
 
 class HelloFilter(Filter):
-    def run(self, data, context) -> str:
+    def run(self, data, context):
         return "Hello"
 
 
 class WorldFilter(Filter):
-    def run(self, data, context) -> str:
+    def run(self, data, context):
         return f"{data},  World!"
 ```
 
 `functions.py`
 ```python
-def create_message_dict(data: str, context) -> dict:
+def create_message_dict(data, context):
     return {"message": data}
 ```
 
@@ -77,16 +83,20 @@ run app.py
 
 ---
 
+<div id="framework"></div>
+
 ## The Framework
-* [Pipeline](#pipelayerpipeline)
-* [Filter](#pipelayerfilter)
-* [Context](#pipelayercontext)
-* [Manifest](#pipelayermanifest)
+* [Pipeline](#pipeline)
+* [Filter](#filter)
+* [Context](#context)
+* [Manifest](#manifest)
 * [Utilities](#utilities)
 <br><br>
 
 
-### __`pipelayer.Pipeline(`[`Step`](#pipelayerstep)`)`__
+<div id="pipeline"></div>
+
+### __`pipelayer.Pipeline(`[`Step`](#step)`)`__
 
 ***Constructor***
 
@@ -94,23 +104,35 @@ __`__init__(self: Pipeline, steps: List[Union[Step, Callable[Any, [Context]]]] =
 The type hints for the `steps` arg may look confusing. Here's what's allowed:
 
 - Classes and Instances that derive from `pipelayer.Filter` and implement the `run` method
-- Functions (instance/class/static/module) that have the following signature `func(data: Any, context: Any)`
-- Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions: `my_func = lambda data, context: data`
-- **Instances of [`pipelayer.Pipeline`](#pipelayer.Pipeline) (new in v0.3.0)**
+- Functions (instance/class/static/module) that have the following signature
+
+  ```python
+  def func(data: Any, context: Any)
+  ```
+
+- Anonymous functions (lambda) with two arguments that follow the same pattern for regular functions:
+
+  ```python
+  my_func = lambda data, context: data
+  ```
+
+- **Instances of `pipelayer.Pipeline` (new in v0.3.0)**
 
 ***Properties***
 
 __`manifest`__ (Manifest)<br>
-An instance of [`pipelayer.Manifest`](#pipelayermanifest) that is created when the run method is called.
+An instance of [`pipelayer.Manifest`](#manifest) that is created when the run method is called.
 
 ***Methods***
 
-__`run(data: Any, context: Optional[`[`Context`](#pipelayercontext)`]) -> Any`__<br>
+__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
 The pipeline runner that iterates through the `steps` and pipes filter output to the next step.
 <br><br>
 
 
-### __`pipelayer.Filter(`[`Step`](#pipelayerstep)`)`__
+<div id="filter"></div>
+
+### __`pipelayer.Filter(`[`Step`](#step)`)`__
 A base class with an abstract `run` method.
 
 ***Properties***
@@ -124,18 +146,20 @@ Optional.
 ***Methods***
 
 __`@abstractmethod`__<br>
-__`run(data: Any, context: Optional[`[`Context`](#pipelayercontext)`]) -> Any`__<br>
+__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
 The abstract filter runner.
 <br><br>
 
 
+<div id="step"></div>
+
 ### __`pipelayer.Step`__
-The base class that is sub-classed by [`pipelayer.Pipeline`](#pipelayerpipeline) and [`pipelayer.Filter`](#pipelayerfilter).
+The base class that is sub-classed by [`pipelayer.Pipeline`](#pipeline) and [`pipelayer.Filter`](#filter).
 
 ***Abstract Methods***
 
 __`@abstractmethod`__<br>
-__`run(data: Any, context: Optional[`[`Context`](#pipelayercontext)`]) -> Any`__<br>
+__`run(data: Any, context: Optional[`[`Context`](#context)`]) -> Any`__<br>
 The abstract
 
 ***Properties***
@@ -145,13 +169,17 @@ Optional. Used by the Manifest
 <br><br>
 
 
+<div id="context"></div>
+
 ### __`pipelayer.Context`__
 A extensible base class for runtime app config.
 <br><br>
 
 
+<div id="manifest"></div>
+
 ### __`pipelayer.Manifest`__
-The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#pipelayerfilter) activity.
+The Manifest keeps a record of [`Pipeline`](#pipeline) and [`Filter`](#filter) activity.
 
 
 ### Utilities

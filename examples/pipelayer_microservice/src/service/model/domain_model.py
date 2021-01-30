@@ -5,7 +5,7 @@ from stringbender import camel
 
 
 def to_camel(s: str) -> str:
-    return camel(s).str()
+    return camel(s)
 
 
 # TODO Add a json encoder to convert model fields to camelCase

@@ -96,7 +96,7 @@ run app.py
 
 <div id="pipeline"></div>
 
-### __`pipelayer.Pipeline(Step)`__
+### __`pipelayer.Pipeline`__
 __`__init__(steps, name)`__
 
 *args:*
@@ -141,7 +141,7 @@ The pipeline runner that iterates through the `steps` and pipes filter output to
 
 <div id="filter"></div>
 
-### __`pipelayer.Filter(Step)`__
+### __`pipelayer.Filter`__
 ___`__init__(name, pre_process, post_process)`___
 
 *args:*

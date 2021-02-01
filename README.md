@@ -104,19 +104,20 @@ __`__init__(steps, name)`__
 - `steps: List[Union[Step, Callable[[Any, Context], Any]]]`<br>
 A list of:
   - Classes and Instances that derive from `pipelayer.Filter` and implement the `run` method
+  - Classes that implement the `pipelayer.Step` protocol
   - Functions (instance/class/static/module) that have the following signature
 
     ```python
     def func(data: Any, context: Any)
     ```
 
-  - Anonymous functions (lambda) with two arguments that follow the same pattern:
+  - Anonymous functions (lambda) with two arguments that follow this pattern:
 
     ```python
     my_func = lambda data, context: data
     ```
 
-  - **Instances of `pipelayer.Pipeline` (new in v0.3.0)**
+  - Instances of `pipelayer.Pipeline`
 
 - `name: Optional[str]`<br>
    If not specified, the class name will be used.
@@ -159,19 +160,9 @@ __`post_process: Optional[Callable[[Any, Context], Any]`__
 
 <div id="step"></div>
 
-### __`pipelayer.Step`__
-__`__init__(name)`__
+### __`pipelayer.Step(Protocol)`__
 
-*args:*
-- `name: Optional[str]`<br>
-   If not specified, the class name will be used.
-
-***Properties:***
-
-__`name: str`__<br>
-The name of the step
-
-***Abstract Methods:***
+***Methods:***
 
 __`run(data, context) -> Any`__<br>
 
@@ -179,11 +170,6 @@ __`run(data, context) -> Any`__<br>
 
 - `data: Any`
 - `context: pipelayer.Context`
-
-***Properties:***
-
-__`name: str`__<br>
-Optional. Used by the Manifest.
 <br><br>
 
 

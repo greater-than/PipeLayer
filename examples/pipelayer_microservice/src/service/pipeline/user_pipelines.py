@@ -14,8 +14,8 @@ get_user_pipeline: Pipeline = Pipeline(
     ]
 )
 
-
 get_users_pipeline: Pipeline = Pipeline(
+    name="Get Users Pipeline",
     steps=[
         MapRequest.from_get_users_request,
         ResReq.get_users,
@@ -24,8 +24,8 @@ get_users_pipeline: Pipeline = Pipeline(
     ]
 )
 
-
 find_users_pipeline: Pipeline = Pipeline(
+    name="Find Users Pipeline",
     steps=[
         MapRequest.from_find_user_request,
         ResReq.find_users,

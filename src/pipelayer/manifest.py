@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
-from enum import Enum
-from typing import Optional
+from typing import Callable, Optional
 
+from pipelayer.step import StepType
 from pydantic import BaseModel
 from pydantic.json import timedelta_isoformat
+from stringbender import camel
 
 
-class StepType(Enum):
-    PIPELINE = "pipeline"
-    FILTER = "filter"
-    FUNCTION = "function"
+def to_camel(s: str) -> str:
+    return camel(s)
 
 
 class ManifestEntry(BaseModel):
@@ -24,6 +23,8 @@ class ManifestEntry(BaseModel):
             datetime: lambda dt: dt.timestamp(),
             timedelta: timedelta_isoformat,
         }
+        allow_population_by_field_name: bool = True
+        alias_generator: Callable = to_camel
 
 
 class ManifestEntryList(list):

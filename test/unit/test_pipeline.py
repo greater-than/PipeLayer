@@ -63,38 +63,95 @@ class TestPipeline:
         assert isinstance(pipeline.manifest.__dict__, dict)
 
     @pytest.mark.happy
-    def test_pipeline_static_filter_funcs(self, app_context):
-        import json
+    def test_pipeline_all_filter_types(self, app_context):
 
         class FirstFilter(Filter):
             def run(self, data, context) -> dict:
-                return {"something": "goes here"}
+                return {"message": "The cat in that box is dead"}
 
         def second_filter(data, context) -> dict:
-            data.update({"something": "got changed"})
+            data["message"] += ", or maybe not."
             return data
+
+        class ThirdFilter:
+            def __init__(self, name: str) -> None:
+                self.name = name
+
+            def run(self, data, context) -> dict:
+                data["message"] += " We'll never know."
+                return data
+
+        class FourthFilter:
+            @staticmethod
+            def get_attribution(data, context) -> dict:
+                data["message"] += " --Schrodinger"
+                return data
+
+        class FifthFilter:
+            @staticmethod
+            def run(data, context) -> dict:
+                return data
+
+        class SixthFilter:
+            @staticmethod
+            def run(data, context) -> dict:
+                return data
 
         steps = [
             FirstFilter,
             second_filter,
+            ThirdFilter("'We\'ll never know' Filter"),
+            FourthFilter.get_attribution,
+            FifthFilter,
+            SixthFilter(),
             lambda data, context: json.dumps(data)
         ]
 
-        pipeline = Pipeline(steps)
+        pipeline = Pipeline(steps, "Schrodinger's Pipeline")
         response = pipeline.run(None)
 
-        assert pipeline.name == "Pipeline"
-        assert pipeline.manifest.name == "Pipeline"
+        assert pipeline.name == "Schrodinger's Pipeline"
+        assert pipeline.manifest.name == "Schrodinger's Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert pipeline.manifest.steps[1].name == "second_filter"
-        assert pipeline.manifest.steps[2].name == "<lambda data, context: json.dumps(data)>"
-        assert response == '{"something": "got changed"}'
+        assert pipeline.manifest.steps[2].name == "'We\'ll never know' Filter"
+        assert pipeline.manifest.steps[3].name == "get_attribution"
+        assert pipeline.manifest.steps[4].name == "FifthFilter"
+        assert pipeline.manifest.steps[5].name == "SixthFilter"
+        assert pipeline.manifest.steps[6].name == "<lambda data, context: json.dumps(data)>"
+        assert response == '{"message": "The cat in that box is dead, or maybe not. We\'ll never know. --Schrodinger"}'
         assert isinstance(pipeline.manifest.__dict__, dict)
 
     @pytest.mark.sad
-    def test_initialize_filter_invalid_filter(self):
+    def test_initialize_step_none_step(self):
         with pytest.raises(InvalidFilterException):
             Pipeline._Pipeline__initialize_step(None)
+
+    @pytest.mark.sad
+    def test_initialize_step_invalid_step(self):
+        with pytest.raises(InvalidFilterException):
+            Pipeline._Pipeline__initialize_step(lambda a, b, c: a + b + c)
+
+    @pytest.mark.sad
+    def test_is_callable_valid_false(self):
+        assert Pipeline._Pipeline__is_callable_valid(None) is False
+        assert Pipeline._Pipeline__is_callable_valid("test") is False
+
+    @pytest.mark.sad
+    def test_is_run_static_false(self):
+        class MyClass:
+            def run(self, data, context):
+                pass
+
+        assert Pipeline._Pipeline__is_run_static(MyClass) is False
+
+    @pytest.mark.sad
+    def test_is_run_static_type_error(self):
+        class MyClass:
+            pass
+
+        with pytest.raises(AttributeError):
+            Pipeline._Pipeline__is_run_static(MyClass)
 
     @pytest.mark.sad
     def test_filter_raises_exception(self):

@@ -1,4 +1,10 @@
-# Version History
+# PipeLayer: Version History
+
+## 0.3.1 - 1/31/21
+* Adds support for classes that implement the `pipelayer.Step` protocol as steps
+* `pipelayer.Step` is now a Protocol
+* `pipelater.Pipeline` and `pipelayer.Filter` implement the `pipelayer.Step` protocol
+* Updates type hints for pre_/post_process arguments in `pipelayer.Filter` constructor
 
 ## 0.3.0 - 1/30/21
 It's still in beta and bumping the version to 1.0.0 was deferred--despite the breaking changes.

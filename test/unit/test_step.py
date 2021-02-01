@@ -5,9 +5,7 @@ import pytest
 class TestStep:
 
     @pytest.mark.sad
-    def test_step_run_not_implemented(self):
+    def test_step(self):
         from pipelayer.step import Step
-        step = Step()
-
         with pytest.raises(NotImplementedError):
-            step.run(None, None)
+            Step.run(None, None, None)

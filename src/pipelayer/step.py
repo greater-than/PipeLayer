@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from abc import ABC
-from typing import Any
+from enum import Enum
+from typing import Any, Protocol, Union, runtime_checkable
+
+from pipelayer.context import Context
 
 
-class Step(ABC):
-    def __init__(self: Step, name: str = "") -> None:
-        self.__name = name or self.__class__.__name__
+class StepType(Enum):
+    PIPELINE = "pipeline"
+    FILTER = "filter"
+    FUNCTION = "function"
 
-    @property
-    def name(self) -> str:
-        return self.__name
 
-    def run(self, data: Any, context: Any) -> Any:
+@runtime_checkable
+class Step(Protocol):
+    def run(self, data: Any, context: Union[Context, None]) -> Any:
         raise NotImplementedError

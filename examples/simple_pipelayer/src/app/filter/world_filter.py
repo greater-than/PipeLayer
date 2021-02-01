@@ -1,7 +1,8 @@
-from app.app_context import AppContext
 from pipelayer import Filter
+
+from app.app_context import AppContext
 
 
 class WorldFilter(Filter):
-    def run(self, context: AppContext, data: str) -> str:
-        return f"{data}, World."
+    def run(self, greeting: str, context: AppContext) -> str:
+        return f"{greeting}, World."

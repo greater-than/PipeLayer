@@ -1,8 +1,6 @@
 import json
-from typing import List, Union
 
 from pipelayer import Manifest
-
 from service.access_control import authorize
 from service.api import handle_exception
 from service.config import context
@@ -13,9 +11,10 @@ from service.pipeline.user_pipelines import (find_users_pipeline,
                                              get_users_pipeline)
 
 
-def get_response(model: Union[DomainModel, List[DomainModel]], manifest: Manifest) -> dict:
+def get_response(model: DomainModel, manifest: Manifest) -> dict:
+    model = model.__root__ if hasattr(model, "__root__") else model
     resp_model = Response(data=model, manifest=manifest)
-    return json.loads(resp_model.json())
+    return json.loads(resp_model.json(by_alias=True))
 
 
 @authorize
@@ -40,6 +39,6 @@ def get_users(**kwargs) -> dict:
 def find_users(**kwargs) -> dict:
     try:
         users = find_users_pipeline.run(kwargs, context)
-        return get_response(users, get_user_pipeline.manifest)
+        return get_response(users, find_users_pipeline.manifest)
     except Exception as e:
         return handle_exception(e)

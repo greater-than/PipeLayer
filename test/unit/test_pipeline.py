@@ -2,7 +2,6 @@ import json
 
 import pytest
 from pipelayer import Filter, Pipeline
-from pipelayer.exception import InvalidFilterException
 from pipelayer.util import MockFilter
 
 
@@ -97,7 +96,13 @@ class TestPipeline:
             def run(data, context) -> dict:
                 return data
 
+        pipeline = Pipeline([
+            FifthFilter,
+            SixthFilter
+        ])
+
         steps = [
+            pipeline,
             FirstFilter,
             second_filter,
             ThirdFilter("'We\'ll never know' Filter"),
@@ -112,46 +117,16 @@ class TestPipeline:
 
         assert pipeline.name == "Schrodinger's Pipeline"
         assert pipeline.manifest.name == "Schrodinger's Pipeline"
-        assert pipeline.manifest.steps[0].name == "FirstFilter"
-        assert pipeline.manifest.steps[1].name == "second_filter"
-        assert pipeline.manifest.steps[2].name == "'We\'ll never know' Filter"
-        assert pipeline.manifest.steps[3].name == "get_attribution"
-        assert pipeline.manifest.steps[4].name == "FifthFilter"
-        assert pipeline.manifest.steps[5].name == "SixthFilter"
-        assert pipeline.manifest.steps[6].name == "<lambda data, context: json.dumps(data)>"
+        assert pipeline.manifest.steps[0].name == "Pipeline"
+        assert pipeline.manifest.steps[1].name == "FirstFilter"
+        assert pipeline.manifest.steps[2].name == "second_filter"
+        assert pipeline.manifest.steps[3].name == "'We\'ll never know' Filter"
+        assert pipeline.manifest.steps[4].name == "get_attribution"
+        assert pipeline.manifest.steps[5].name == "FifthFilter"
+        assert pipeline.manifest.steps[6].name == "SixthFilter"
+        assert pipeline.manifest.steps[7].name == "<lambda data, context: json.dumps(data)>"
         assert response == '{"message": "The cat in that box is dead, or maybe not. We\'ll never know. --Schrodinger"}'
         assert isinstance(pipeline.manifest.__dict__, dict)
-
-    @pytest.mark.sad
-    def test_initialize_step_none_step(self):
-        with pytest.raises(InvalidFilterException):
-            Pipeline._Pipeline__initialize_step(None)
-
-    @pytest.mark.sad
-    def test_initialize_step_invalid_step(self):
-        with pytest.raises(InvalidFilterException):
-            Pipeline._Pipeline__initialize_step(lambda a, b, c: a + b + c)
-
-    @pytest.mark.sad
-    def test_is_callable_valid_false(self):
-        assert Pipeline._Pipeline__is_callable_valid(None) is False
-        assert Pipeline._Pipeline__is_callable_valid("test") is False
-
-    @pytest.mark.sad
-    def test_is_run_static_false(self):
-        class MyClass:
-            def run(self, data, context):
-                pass
-
-        assert Pipeline._Pipeline__is_run_static(MyClass) is False
-
-    @pytest.mark.sad
-    def test_is_run_static_type_error(self):
-        class MyClass:
-            pass
-
-        with pytest.raises(AttributeError):
-            Pipeline._Pipeline__is_run_static(MyClass)
 
     @pytest.mark.sad
     def test_filter_raises_exception(self):

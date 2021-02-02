@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import inspect
 from datetime import datetime
-from typing import Any, Callable, List, Optional, Tuple, Union, cast
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
+from pipelayer import pipeline
 from pipelayer.context import Context
 from pipelayer.exception import InvalidFilterException
 from pipelayer.filter import Filter
@@ -47,31 +49,30 @@ class Pipeline:
         """
         The Pipeline runner
         """
-        return self.__run(data, context or Context())[0]
+        return self.run_steps(data, context or Context())[0]
 
-    def __run(self, data: Any, context: Context) -> Any:
+    def run_steps(self, data: Any, context: Context) -> Any:
         self.__initialize_manifest()
 
         add_to_manifest = self.manifest.steps.append
         create_step_manifest_entry = Pipeline.__create_step_manifest_entry
         close_manifest_entry = Pipeline.__close_manifest_entry
-        initialize_step = Pipeline.__initialize_step
+        initialize_step = StepHelper.initialize_step
         run_step_process = Pipeline.__run_step_process
 
         for step_name, step_type, step_func, pre_process, post_process in map(initialize_step, self.steps):
             manifest_entry = create_step_manifest_entry(step_name, step_type)
 
-            # pre_process
-            data, manifest_entry.pre_process = run_step_process(pre_process, data, context)
-
-            # step
             if step_type is StepType.PIPELINE:
+                # nested pipeline
                 data, manifest_entry.steps = step_func(data, context)
             else:
+                # step.pre_process
+                data, manifest_entry.pre_process = run_step_process(pre_process, data, context)
+                # step
                 data = step_func(data, context)
-
-            # post_process
-            data, manifest_entry.post_process = run_step_process(post_process, data, context)
+                # step.post_process
+                data, manifest_entry.post_process = run_step_process(post_process, data, context)
 
             close_manifest_entry(manifest_entry)
             add_to_manifest(manifest_entry)
@@ -133,10 +134,39 @@ class Pipeline:
         manifest_entry.duration = manifest_entry.end - manifest_entry.start
 
     # endregion
-    # region Step Initialization
+
+
+class Switch:
+    def __init__(self,
+                 expression: Union[Step, Callable[[Any, Context], Any]],
+                 cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]) -> None:
+        self.__expression = expression
+        self.__cases = cases
+
+    def __init_subclass__(cls, **kwargs: Any):
+        raise TypeError(f"type '{Switch.__name__}' is not an acceptable base type")
+
+    @property
+    def expression(self) -> Union[Step, Callable[[Any, Context], Any]]:
+        return self.__expression
+
+    @property
+    def cases(self) -> Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]:
+        return self.__cases
+
+    def run(self, data: Any, context: Context) -> Any:
+        step = StepHelper.get_step(self.expression)
+        expr_func = StepHelper.get_step_func(step)
+        label = next(case for case in self.cases if case is expr_func(data, context))
+        case = self.cases[label]
+        case_func = StepHelper.get_step_func(case)
+        return case_func(data, context)
+
+
+class StepHelper:
 
     @staticmethod
-    def __initialize_step(
+    def initialize_step(
         step: Union[Step, Callable[[Any, Context], Any]]
     ) -> Tuple[
         str,
@@ -145,13 +175,11 @@ class Pipeline:
         Optional[Callable[[Any, Context], Any]],
         Optional[Callable[[Any, Context], Any]],
     ]:
-        if Pipeline.__is_step_type(step) and not Pipeline.__is_run_static(cast(Step, step)):
-            step = cast(type, step)()
-
-        step_type = Pipeline.__get_step_type(step)
-        step_func = Pipeline.__get_step_func(step)
-        pre, post = Pipeline.__get_sub_processes(step)
-        return Pipeline.__get_step_name(step), step_type, step_func, pre, post
+        step = StepHelper.get_step(step)
+        step_type = StepHelper.get_step_type(step)
+        step_func = StepHelper.get_step_func(step)
+        pre, post = StepHelper.get_sub_processes(step)
+        return StepHelper.get_step_name(step), step_type, step_func, pre, post
 
     @staticmethod
     def __is_step_type(step: Union[Step, Callable[[Any, Context], Any]]) -> bool:
@@ -162,7 +190,13 @@ class Pipeline:
         return inspect.getfullargspec(step.run).args[0] != "self"
 
     @staticmethod
-    def __get_step_name(step: Any) -> str:
+    def get_step(step: Union[Step, Callable[[Any, Context], Any]]) -> Union[Step, Callable[[Any, Context], Any]]:
+        if StepHelper.__is_step_type(step) and not StepHelper.__is_run_static(cast(Step, step)):
+            return cast(type, step)()
+        return step
+
+    @staticmethod
+    def get_step_name(step: Any) -> str:
         if hasattr(step, "name") and step.name:
             return step.name
 
@@ -176,25 +210,25 @@ class Pipeline:
         )
 
     @staticmethod
-    def __get_step_type(step: Union[Step, Callable[[Any, Context], Any]]) -> StepType:
+    def get_step_type(step: Union[Step, Callable[[Any, Context], Any]]) -> StepType:
         if isinstance(step, Step):
-            return StepType.PIPELINE if isinstance(step, Pipeline) else StepType.FILTER
+            return StepType(step.__class__.__name__) if step.__class__.__name__ in StepType else StepType.FILTER
         return StepType.FUNCTION
 
     @staticmethod
-    def __get_step_func(step: Union[Step, Callable[[Any, Context], Any]]) -> Callable[[Any, Context], Any]:
+    def get_step_func(step: Union[Step, Callable[[Any, Context], Any]]) -> Callable[[Any, Context], Any]:
         if isinstance(step, Step):
-            run_func = step.__run if isinstance(step, Pipeline) else step.run
+            run_func = step.run_steps if isinstance(step, pipeline.Pipeline) else step.run
             return cast(Callable[[Any, Context], Any], run_func)
 
-        if not Pipeline.__is_callable_valid(cast(Callable, step)):
+        if not StepHelper.__is_callable_valid(cast(Callable, step)):
             raise InvalidFilterException(
                 "Step functions must have the same signataure as 'pipelayer.Step.run'"
             )
         return cast(Callable, step)
 
     @staticmethod
-    def __get_sub_processes(
+    def get_sub_processes(
         step: Union[Step, Callable[[Any, Context], Any]]
     ) -> Tuple[
         Optional[Callable[[Any, Context], Any]],
@@ -208,5 +242,3 @@ class Pipeline:
             return False
         args = inspect.signature(obj).parameters
         return len(args) == 2
-
-    # endregion

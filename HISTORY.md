@@ -1,6 +1,9 @@
 # PipeLayer: Version History
 
-## 0.3.1 - 1/31/21
+## 0.4.0
+* Adds Switch filter
+
+## 0.3.1 - 2/1/21
 * Adds support for classes that implement the `pipelayer.Step` protocol as steps
 * `pipelayer.Step` is now a Protocol
 * `pipelater.Pipeline` and `pipelayer.Filter` implement the `pipelayer.Step` protocol

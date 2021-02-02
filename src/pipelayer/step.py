@@ -4,12 +4,14 @@ from enum import Enum
 from typing import Any, Protocol, Union, runtime_checkable
 
 from pipelayer.context import Context
+from pipelayer.enum_meta import EnumContains
 
 
-class StepType(Enum):
-    PIPELINE = "pipeline"
-    FILTER = "filter"
-    FUNCTION = "function"
+class StepType(Enum, metaclass=EnumContains):
+    PIPELINE = "Pipeline"
+    SWITCH = "Switch"
+    FILTER = "Filter"
+    FUNCTION = "Function"
 
 
 @runtime_checkable

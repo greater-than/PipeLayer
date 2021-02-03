@@ -14,6 +14,23 @@ from pipelayer.manifest import (Manifest, ManifestEntry, ManifestEntryList,
 from pipelayer.step import Step, StepType
 
 
+class State(Enum):
+    IDLE = 0
+    RUNNING = 100
+    WAITING = 110
+    PAUSED = 120
+    COMPLETE = 200
+    EXITED = 210
+    TERMINATED = 220
+
+
+class Action(Enum):
+    TERMINATE = 0
+    RESUME = 1
+    PAUSE = 2
+    RESTART = 3
+
+
 class Pipeline:
     # region Constructors
 
@@ -23,6 +40,7 @@ class Pipeline:
         self.__name = name or self.__class__.__name__
         self.__steps: List[Union[Step, Callable[[Any, Context], Any]]] = steps
         self.__manifest: Manifest = None  # type: ignore
+        self.__state: State = State.IDLE
 
     def __init_subclass__(cls, **kwargs: Any):
         raise TypeError(f"type '{Pipeline.__name__}' is not an acceptable base type")
@@ -33,6 +51,10 @@ class Pipeline:
     @property
     def name(self) -> str:
         return self.__name
+
+    @property
+    def state(self) -> State:
+        return self.__state
 
     @property
     def steps(self) -> List[Union[Step, Callable[[Any, Context], Any]]]:
@@ -49,7 +71,10 @@ class Pipeline:
         """
         The Pipeline runner
         """
-        return self.run_steps(data, context or Context())[0]
+        self.__state = State.RUNNING
+        data = self.run_steps(data, context or Context())[0]
+        self.__state = State.COMPLETE
+        return data
 
     def run_steps(self, data: Any, context: Context) -> Any:
         self.__initialize_manifest()

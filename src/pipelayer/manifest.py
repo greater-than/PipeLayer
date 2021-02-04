@@ -7,15 +7,16 @@ from pydantic.json import timedelta_isoformat
 from stringbender import camel
 
 
-def to_camel(s: str) -> str:
-    return camel(s)
+class ManifestEntryList(list):
+    ...
 
 
 class ManifestEntry(BaseModel):
     name: str
+    step_type: StepType
     start: datetime
-    end: Optional[datetime]
-    duration: Optional[timedelta]
+    end: Optional[datetime] = None
+    duration: Optional[timedelta] = None
 
     class Config:
         use_enum_values = True
@@ -24,22 +25,21 @@ class ManifestEntry(BaseModel):
             timedelta: timedelta_isoformat,
         }
         allow_population_by_field_name: bool = True
-        alias_generator: Callable = to_camel
+        alias_generator: Callable = camel
 
 
-class ManifestEntryList(list):
-    ...
+class CompoundStepManifestEntry(ManifestEntry):
+    steps: ManifestEntryList = ManifestEntryList()
 
 
-class StepManifestEntry(ManifestEntry):
-    step_type: StepType
-    steps: Optional[ManifestEntryList]
+class FilterManifestEntry(CompoundStepManifestEntry):
+    step_type: StepType = StepType.FILTER
     pre_process: Optional[ManifestEntry]
     post_process: Optional[ManifestEntry]
 
 
-class Manifest(ManifestEntry):
+class Manifest(CompoundStepManifestEntry):
     """
     A running log of pipeline activity
     """
-    steps: ManifestEntryList = ManifestEntryList()
+    step_type: StepType

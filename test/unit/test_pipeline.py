@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from pipelayer import Filter, Pipeline
+from pipelayer import Filter, Pipeline, State
 from pipelayer.util import MockFilter
 
 
@@ -27,12 +27,15 @@ class TestPipeline:
 
         pipeline = Pipeline(steps)
         response = pipeline.run(None)
+        m = pipeline.manifest
+        s = pipeline.state
 
         assert pipeline.name == "Pipeline"
         assert pipeline.manifest.name == "Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert response == '{"something": "goes here"}'
-        assert isinstance(pipeline.manifest.__dict__, dict)
+        assert s == State.COMPLETE
+        assert isinstance(m.__dict__, dict)
 
     @pytest.mark.happy
     def test_nested_pipeline(self, app_context):

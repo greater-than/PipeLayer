@@ -11,7 +11,7 @@ class TestProtocol:
             Step.run(None, None, None)
 
     @pytest.mark.sad
-    def test_pipeline(self):
-        from pipelayer.pipeline import Pipeline
+    def test_compound_step(self):
+        from pipelayer.compound_step import CompoundStep
         with pytest.raises(NotImplementedError):
-            Pipeline.run_steps(None, None, None)
+            CompoundStep.run_steps(None, None, None)

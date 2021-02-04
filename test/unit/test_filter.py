@@ -5,7 +5,13 @@ import pytest
 class TestFilter:
 
     @pytest.mark.sad
+    def test_filter_subclass(self):
+        from pipelayer.filter import Filter
+        with pytest.raises(TypeError):
+            Filter()
+
+    @pytest.mark.sad
     def test_filter_run_not_implemented(self):
         from pipelayer.filter import Filter
         with pytest.raises(NotImplementedError):
-            Filter().run(None, None)
+            Filter.run(None, None, None)

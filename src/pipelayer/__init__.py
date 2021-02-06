@@ -13,27 +13,6 @@ from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
 from pipelayer.step import StepType
 from pipelayer.step.protocol import Step
 
-# region Enums
-
-
-class State(Enum):
-    IDLE = 0
-    RUNNING = 1
-    WAITING = 2
-    PAUSED = 3
-    EXITED = 4
-    TERMINATED = 5
-    COMPLETE = 6
-
-
-class Action(Enum):
-    TERMINATE = 0
-    RESUME = 1
-    PAUSE = 2
-    RESTART = 3
-
-# endregion
-
 
 class Pipeline:
     # region Constructors
@@ -44,7 +23,7 @@ class Pipeline:
         self.__name = name or self.__class__.__name__
         self.__steps: List[Union[Step, Callable[[Any, Context], Any]]] = steps
         self.__manifest: ManifestEntry = None  # type: ignore
-        self.__state: State = State.IDLE
+        self.__state: Pipeline.State = Pipeline.State.IDLE
 
     def __init_subclass__(cls, **kwargs: Any):
         raise TypeError(f"type '{Pipeline.__name__}' is not an acceptable base type")
@@ -69,15 +48,33 @@ class Pipeline:
         return self.__manifest
 
     # endregion
+    # region Enums
+
+    class State(Enum):
+        IDLE = 0
+        RUNNING = 1
+        WAITING = 2
+        PAUSED = 3
+        EXITED = 4
+        TERMINATED = 5
+        COMPLETE = 6
+
+    class Action(Enum):
+        TERMINATE = 0
+        RESUME = 1
+        PAUSE = 2
+        RESTART = 3
+
+    # endregion
     # region Runners
 
     def run(self, data: Any, context: Optional[Context] = None) -> Any:
         """
         The Pipeline runner
         """
-        self.__state = State.RUNNING
+        self.__state = Pipeline.State.RUNNING
         data, self.__manifest = self._run_steps(data, context or Context())
-        self.__state = State.COMPLETE
+        self.__state = Pipeline.State.COMPLETE
         return data
 
     def _run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:

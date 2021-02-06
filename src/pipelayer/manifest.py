@@ -43,3 +43,31 @@ class Manifest(CompoundStepManifestEntry):
     A running log of pipeline activity
     """
     step_type: StepType
+
+
+class ManifestManager:
+
+    @staticmethod
+    def create_manifest(name: str, step_type: Optional[StepType] = StepType.PIPELINE) -> Manifest:
+        return Manifest(
+            name=name,
+            step_type=step_type or StepType.PIPELINE,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def create_filter_manifest_entry(name: str) -> FilterManifestEntry:
+        return FilterManifestEntry(
+            name=name,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def create_manifest_entry(name: str, step_type: StepType) -> ManifestEntry:
+        return ManifestEntry(
+            name=name,
+            step_type=step_type,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def close_manifest_entry(manifest_entry: ManifestEntry) -> None:
+        manifest_entry.end = datetime.utcnow()
+        manifest_entry.duration = manifest_entry.end - manifest_entry.start

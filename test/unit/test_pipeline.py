@@ -10,7 +10,7 @@ class TestPipeline:
 
     @pytest.mark.happy
     def test_pipeline_interface_implemented(self):
-        from pipelayer.protocol.compound_step import CompoundStep
+        from pipelayer.protocol import CompoundStep
         assert isinstance(Pipeline([]), CompoundStep)
 
     @pytest.mark.happy

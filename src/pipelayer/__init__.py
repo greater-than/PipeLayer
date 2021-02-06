@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-import inspect
-from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from pipelayer.context import Context
-from pipelayer.exception import InvalidFilterException
-from pipelayer.filter import Filter
-from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
-from pipelayer.protocol.compound_step import CompoundStep
-from pipelayer.protocol.step import Step
-from pipelayer.step import StepType
+from pipelayer.filter import Filter  # NOQA F401
+from pipelayer.manifest import (FilterManifestEntry, Manifest, ManifestEntry,
+                                ManifestManager)
+from pipelayer.protocol import Step
+from pipelayer.step import StepHelper, StepType
 
 
 class Pipeline:
@@ -78,11 +75,11 @@ class Pipeline:
         return data
 
     def _run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
-        manifest = ManifestHelper.create_manifest(self.name)
+        manifest = ManifestManager.create_manifest(self.name)
 
-        create_filter_manifest_entry = ManifestHelper.create_filter_manifest_entry
-        create_manifest = ManifestHelper.create_manifest
-        close_manifest_entry = ManifestHelper.close_manifest_entry
+        create_filter_manifest_entry = ManifestManager.create_filter_manifest_entry
+        create_manifest = ManifestManager.create_manifest
+        close_manifest_entry = ManifestManager.close_manifest_entry
         add_to_manifest = manifest.steps.append
         initialize_step = StepHelper.initialize_step
         run_step_process = Pipeline.__run_step_process
@@ -128,14 +125,14 @@ class Pipeline:
         if not process:
             return data, None
 
-        manifest_entry = ManifestHelper.create_manifest_entry(
+        manifest_entry = ManifestManager.create_manifest_entry(
             name=process.__name__,
             step_type=StepType.FUNCTION
         )
 
         data = process(data, context)
 
-        ManifestHelper.close_manifest_entry(manifest_entry)
+        ManifestManager.close_manifest_entry(manifest_entry)
 
         return data, manifest_entry
 
@@ -199,7 +196,7 @@ class Switch:
         get_step_type = StepHelper.get_step_type
         get_step_func = StepHelper.get_step_func
 
-        manifest = ManifestHelper.create_manifest(
+        manifest = ManifestManager.create_manifest(
             StepHelper.get_step_name(self.expression),
             StepType.SWITCH
         )
@@ -214,127 +211,18 @@ class Switch:
         # Execute Case
         case = self.cases[label]
         case_func = get_step_func(case)
-        case_manifest_entry = ManifestHelper.create_manifest_entry(
+        case_manifest_entry = ManifestManager.create_manifest_entry(
             get_step_name(case_func),
             get_step_type(case_func)
         )
         data = case_func(data, context)
 
-        ManifestHelper.close_manifest_entry(case_manifest_entry)
+        ManifestManager.close_manifest_entry(case_manifest_entry)
         manifest.steps.append(case_manifest_entry)
 
-        ManifestHelper.close_manifest_entry(manifest)
+        ManifestManager.close_manifest_entry(manifest)
         self.__manifest = manifest
 
         return data, manifest
 
     # endregion
-
-
-class StepHelper:
-
-    @staticmethod
-    def initialize_step(
-        step: Union[Step, Callable[[Any, Context], Any]]
-    ) -> Tuple[
-        str,
-        StepType,
-        Callable[[Any, Context], Any],
-        Optional[Callable[[Any, Context], Any]],
-        Optional[Callable[[Any, Context], Any]],
-    ]:
-        step = StepHelper.get_step(step)
-        step_type = StepHelper.get_step_type(step)
-        step_func = StepHelper.get_step_func(step)
-        pre, post = StepHelper.get_sub_processes(step)
-        return StepHelper.get_step_name(step), step_type, step_func, pre, post
-
-    @staticmethod
-    def get_step(step: Union[Step, Callable[[Any, Context], Any]]) -> Union[Step, Callable[[Any, Context], Any]]:
-        if StepHelper.__is_step_type(step) and not StepHelper.__is_run_static(cast(Step, step)):
-            return cast(type, step)()
-        return step
-
-    @staticmethod
-    def get_step_name(step: Any) -> str:
-        if hasattr(step, "name") and step.name:
-            return step.name
-
-        if isinstance(step, Step):
-            return cast(type, step).__name__ if inspect.isclass(step) else step.__class__.__name__
-
-        return (
-            f"<{inspect.getsource(step).strip()}>"
-            if step.__name__ == "<lambda>"
-            else step.__name__
-        )
-
-    @staticmethod
-    def get_step_type(step: Union[Step, Callable[[Any, Context], Any]]) -> StepType:
-        if isinstance(step, Step):
-            return StepType(step.__class__.__name__) if step.__class__.__name__ in StepType else StepType.FILTER
-        return StepType.FUNCTION
-
-    @staticmethod
-    def get_step_func(step: Union[Step, Callable[[Any, Context], Any]]) -> Callable[[Any, Context], Any]:
-        if isinstance(step, Step):
-            run_func = step._run_steps if isinstance(step, CompoundStep) else step.run
-            return cast(Callable[[Any, Context], Any], run_func)
-
-        if not StepHelper.__is_callable_valid(cast(Callable, step)):
-            raise InvalidFilterException(
-                "Step functions must have the same signataure as 'pipelayer.Step.run'"
-            )
-        return cast(Callable, step)
-
-    @staticmethod
-    def get_sub_processes(
-        step: Union[Step, Callable[[Any, Context], Any]]
-    ) -> Tuple[
-        Optional[Callable[[Any, Context], Any]],
-        Optional[Callable[[Any, Context], Any]]
-    ]:
-        return (step.pre_process, step.post_process) if isinstance(step, Filter) else (None, None)
-
-    @staticmethod
-    def __is_step_type(step: Union[Step, Callable[[Any, Context], Any]]) -> bool:
-        return inspect.isclass(step) and issubclass(cast(type, step), Step)
-
-    @staticmethod
-    def __is_run_static(step: Step) -> bool:
-        return inspect.getfullargspec(step.run).args[0] != "self"
-
-    @staticmethod
-    def __is_callable_valid(obj: Callable[..., Any]) -> bool:
-        if not obj or not inspect.isfunction(obj):
-            return False
-        args = inspect.signature(obj).parameters
-        return len(args) == 2
-
-
-class ManifestHelper:
-
-    @staticmethod
-    def create_manifest(name: str, step_type: Optional[StepType] = StepType.PIPELINE) -> Manifest:
-        return Manifest(
-            name=name,
-            step_type=step_type or StepType.PIPELINE,
-            start=datetime.utcnow())
-
-    @staticmethod
-    def create_filter_manifest_entry(name: str) -> FilterManifestEntry:
-        return FilterManifestEntry(
-            name=name,
-            start=datetime.utcnow())
-
-    @staticmethod
-    def create_manifest_entry(name: str, step_type: StepType) -> ManifestEntry:
-        return ManifestEntry(
-            name=name,
-            step_type=step_type,
-            start=datetime.utcnow())
-
-    @staticmethod
-    def close_manifest_entry(manifest_entry: ManifestEntry) -> None:
-        manifest_entry.end = datetime.utcnow()
-        manifest_entry.duration = manifest_entry.end - manifest_entry.start

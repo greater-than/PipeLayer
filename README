@@ -180,7 +180,7 @@ __`post_process: Optional[Callable[[Any, Context], Any]`__
 
 <div id="compoundstep"></div>
 
-### __`pipelayer.protocol.step.CompoundStep(Protocol)`__
+### __`pipelayer.CompoundStep(Protocol)`__
 
 ***Properties:***
 
@@ -207,7 +207,7 @@ __`_run_steps(data, context) -> Any`__<br>
 
 <div id="step"></div>
 
-### __`pipelayer.protocol.step.Step(Protocol)`__
+### __`pipelayer.protocol.Step(Protocol)`__
 
 ***Methods:***
 

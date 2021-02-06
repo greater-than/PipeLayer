@@ -87,6 +87,7 @@ run app.py
 
 ## The Framework
 * [Pipeline](#pipeline)
+* [Switch](#switch)
 * [Filter](#filter)
 * [Context](#context)
 * [Manifest](#manifest)
@@ -124,6 +125,12 @@ A list of:
 
 ***Properties:***
 
+__`name: str`__<br>
+
+__`state: Pipeline.State`__<br>
+
+__`steps: List[Union[Step, Callable[[Any, Context], Any]]]`__<br>
+
 __`manifest: Manifest`__<br>
 An instance of [`pipelayer.Manifest`](#manifest) that is created when the run method is called.
 
@@ -136,6 +143,33 @@ The pipeline runner that iterates through the `steps` and pipes filter output to
 
 - `data: Any`
 - `context: pipelayer.Context`
+<br><br>
+
+
+<div id="switch"></div>
+
+### __`pipelayer.Switch`__
+___`__init__(expression, cases, name)`___<br>
+An implementation of a Switch statement as a pipeline filter
+
+*args:*
+- `expression: Union[Step, Callable[[Any, Context], Any]]`
+- `cases: Dict[Union[Step, Callable[[Any, Context], Any]]]`
+- `name: Optional[str]`<br>
+   If not specified, the class name will be used.
+
+
+***Properties:***
+
+__`expression: Union[Step, Callable[[Any, Context], Any]]`__<br>
+__`cases: Dict[Union[Step, Callable[[Any, Context], Any]]]`__<br>
+__`name: Optional[str]`__<br>
+__`manifest: Manifest`__
+
+***Methods:***
+
+__`run(data, context) -> Any`__<br>
+The switch runner that evaluates the specified expresssion executes the matching case.
 <br><br>
 
 
@@ -158,25 +192,10 @@ __`post_process: Optional[Callable[[Any, Context], Any]`__
 <br><br>
 
 
-<div id="step"></div>
-
-### __`pipelayer.Step(Protocol)`__
-
-***Methods:***
-
-__`run(data, context) -> Any`__<br>
-
-*args:*
-
-- `data: Any`
-- `context: pipelayer.Context`
-<br><br>
-
-
 <div id="context"></div>
 
 ### __`pipelayer.Context`__
-A abstract base class for runtime app config.
+A abstract base class for runtime app data.
 <br><br>
 
 

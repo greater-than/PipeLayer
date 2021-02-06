@@ -7,15 +7,16 @@ from pydantic.json import timedelta_isoformat
 from stringbender import camel
 
 
-def to_camel(s: str) -> str:
-    return camel(s)
+class ManifestEntryList(list):
+    ...
 
 
 class ManifestEntry(BaseModel):
     name: str
+    step_type: StepType
     start: datetime
-    end: Optional[datetime]
-    duration: Optional[timedelta]
+    end: Optional[datetime] = None
+    duration: Optional[timedelta] = None
 
     class Config:
         use_enum_values = True
@@ -24,22 +25,49 @@ class ManifestEntry(BaseModel):
             timedelta: timedelta_isoformat,
         }
         allow_population_by_field_name: bool = True
-        alias_generator: Callable = to_camel
+        alias_generator: Callable = camel
 
 
-class ManifestEntryList(list):
-    ...
+class CompoundStepManifestEntry(ManifestEntry):
+    steps: ManifestEntryList = ManifestEntryList()
 
 
-class StepManifestEntry(ManifestEntry):
-    step_type: StepType
-    steps: Optional[ManifestEntryList]
+class FilterManifestEntry(CompoundStepManifestEntry):
+    step_type: StepType = StepType.FILTER
     pre_process: Optional[ManifestEntry]
     post_process: Optional[ManifestEntry]
 
 
-class Manifest(ManifestEntry):
+class Manifest(CompoundStepManifestEntry):
     """
     A running log of pipeline activity
     """
-    steps: ManifestEntryList = ManifestEntryList()
+    step_type: StepType
+
+
+class ManifestManager:
+
+    @staticmethod
+    def create_manifest(name: str, step_type: Optional[StepType] = StepType.PIPELINE) -> Manifest:
+        return Manifest(
+            name=name,
+            step_type=step_type or StepType.PIPELINE,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def create_filter_manifest_entry(name: str) -> FilterManifestEntry:
+        return FilterManifestEntry(
+            name=name,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def create_manifest_entry(name: str, step_type: StepType) -> ManifestEntry:
+        return ManifestEntry(
+            name=name,
+            step_type=step_type,
+            start=datetime.utcnow())
+
+    @staticmethod
+    def close_manifest_entry(manifest_entry: ManifestEntry) -> None:
+        manifest_entry.end = datetime.utcnow()
+        manifest_entry.duration = manifest_entry.end - manifest_entry.start

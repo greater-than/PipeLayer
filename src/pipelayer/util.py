@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from pipelayer.context import Context
 from pipelayer.filter import Filter
-from pipelayer.manifest import Manifest
+from pipelayer.manifest import ManifestEntry
 
 
 class MockFilter(Filter):
@@ -15,7 +15,7 @@ class MockFilter(Filter):
         return data
 
 
-def render_manifest(manifest: Manifest, indent: int = 2) -> str:
+def render_manifest(manifest: ManifestEntry, indent: int = 2) -> str:
     """
     Renders a formatted Manifest
     """

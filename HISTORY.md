@@ -1,6 +1,17 @@
 # PipeLayer: Version History
 
-## 0.3.1 - 1/31/21
+## 0.4.0
+* Adds Switch filter
+* Adds protocols:
+  * `pipelayer.protocol.CompoundStep`
+  * `pipelayer.protocol.Filter`
+  * `pipelayer.protocol.Manifest`
+* Moves `Step` protocol to the `piplayer.protocol` namespace
+* Moves `Pipeline` into separate module
+* Exposes all core classes in root `__init__.py`
+* Updates LICENSE to Free BSD (previous versions still honor the MIT License)
+
+## 0.3.1 - 2/1/21
 * Adds support for classes that implement the `pipelayer.Step` protocol as steps
 * `pipelayer.Step` is now a Protocol
 * `pipelater.Pipeline` and `pipelayer.Filter` implement the `pipelayer.Step` protocol
@@ -17,13 +28,13 @@ BREAKING CHANGES:
 * Adds support for `pipelayer.Pipeline` instances as steps
 * `pipelayer.Pipeline` removes factory method, and implements a constructor that takes `steps` and `name` as args
 * `pipelayer.Pipeline.run` and `pipelayer.Filter.run` method signatures updated.
-* Removed `pipelayer.Settings` base class
-* Removed `settings` and `log` attributes from the `pipelayer.Context` class
-* Removed `pipelayer.exception.PipelineException`
+* Removes `pipelayer.Settings` base class
+* Removes `settings` and `log` attributes from the `pipelayer.Context` class
+* Removes `pipelayer.exception.PipelineException`
 
 ## 0.2.0 - 1/22/21
 * Adds support for static/module/lamba functions as well as `pipelayer.Filter` types as Pipeline Filters
-* Basic signature validation for filter functions
+* Adds Basic signature validation for filter functions
 * context property in `pipelayer.Filter` is typed as `Union[Context]`
 * Handles all exceptions raises by filters and raises a `PipelineException` with the original exception assigned to the `inner_exception` property
 

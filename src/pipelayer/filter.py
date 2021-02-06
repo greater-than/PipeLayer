@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Callable, Optional
 
 from pipelayer.context import Context
 
 
-class Filter:
+class Filter(ABC):
     def __init__(
         self: Filter,
-        name: str = "",
+        name: Optional[str] = "",
         pre_process: Optional[Callable[[Any, Context], Any]] = None,
         post_process: Optional[Callable[[Any, Context], Any]] = None
     ) -> None:

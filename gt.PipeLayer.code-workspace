@@ -10,7 +10,13 @@
             "./src",
             "./test",
             "./examples/simple_pipelayer/src",
-            "./examples/pipelayer_microservice/src",
+            "./examples/pipelayer_microservice/src"
+        ],
+        "python.autoComplete.extraPaths": [
+            "./src",
+            "./test",
+            "./examples/simple_pipelayer/src",
+            "./examples/pipelayer_microservice/src"
         ],
         "python.formatting.provider": "autopep8",
         "editor.formatOnSave": true,

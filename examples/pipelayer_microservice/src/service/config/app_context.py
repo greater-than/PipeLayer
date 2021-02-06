@@ -2,7 +2,6 @@ from logging import Logger
 from typing import Any
 
 from pipelayer import Context
-
 from service.config.app_settings import AppSettings
 
 

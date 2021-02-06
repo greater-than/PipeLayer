@@ -259,9 +259,13 @@ function Clean_Project {
 }
 
 function Run_Unit_Tests {
+    param(
+        [string] $markers
+    )
+    if ($markers) { $markers = "unit and $markers" } else { $markers = "unit" }
     try {
         Write_Banner "Run Unit Tests"
-        $arguments = "-m pytest -m unit --nunit-xml=.test_results/unit-test-results.xml --cov=src --cov-config=pyproject.toml"
+        $arguments = "-m pytest -m ""$markers"" --nunit-xml=.test_results/unit-test-results.xml --cov=src --cov-config=pyproject.toml"
         Execute_Command "python" $arguments
     }
     catch {
@@ -272,9 +276,13 @@ function Run_Unit_Tests {
 }
 
 function Run_Integration_Tests {
+    param(
+        [string] $markers
+    )
+    if ($markers) { $markers = "integration and $markers" } else { $markers = "integration" }
     try {
-        Write_Banner "Run Unit Tests"
-        $arguments = "-m pytest -m integration --nunit-xml=.test_results/integration-test-results.xml"
+        Write_Banner "Run Integration Tests"
+        $arguments = "-m pytest -m ""$markers"" --nunit-xml=.test_results/integration-test-results.xml"
         Execute_Command "python" $arguments
     }
     catch {
@@ -284,38 +292,6 @@ function Run_Integration_Tests {
     }
 }
 
-function Create_Package {
-    try {
-        Write_Banner "Create Package"
-        $arguments = "./setup.py sdist bdist_wheel"
-        Execute_Command "python" $arguments
-    }
-    catch {
-        Write-Host "*** Create Package Failed ***"
-        Write-Host "##vso[task.complete result=failed]"
-        throw
-    }
-}
-
-function Publish_Package {
-    param(
-        [string] $isPyPi = $false
-    )
-    $server = "testpypi"
-    if ($isPyPi) {
-        $server = "pypi"
-    }
-    try {
-        Write_Header "Publish Package"
-        $arguments = "upload --repository $server dist/*"
-        Execute_Command "twine" $arguments
-    }
-    catch {
-        Write-Host "*** Publish Package Failed ***"
-        Write-Host "##vso[task.complete result=failed]"
-        throw
-    }
-}
 function Run_App {
     try {
         Write_Banner "Run Application"
@@ -323,7 +299,7 @@ function Run_App {
         Execute_Command "python" $arguments
     }
     catch {
-        Write-Host "*** Run Integration Tests Failed ***"
+        Write-Host "*** Run Application Tests Failed ***"
         Write-Host "##vso[task.complete result=failed]"
         throw
     }

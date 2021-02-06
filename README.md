@@ -149,7 +149,8 @@ The pipeline runner that iterates through the `steps` and pipes filter output to
 <div id="switch"></div>
 
 ### __`pipelayer.Switch`__
-___`__init__(expression, cases, name)`___
+___`__init__(expression, cases, name)`___<br>
+An implementation of a Switch statement as a pipeline filter
 
 *args:*
 - `expression: Union[Step, Callable[[Any, Context], Any]]`

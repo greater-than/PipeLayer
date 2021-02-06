@@ -1,5 +1,5 @@
 # Manifest syntax https://docs.python.org/2/distutils/sourcedist.html
 
-include README
+include README.md
 include LICENSE
 include PKG-INFO

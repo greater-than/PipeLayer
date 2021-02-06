@@ -22,7 +22,7 @@ def get_gitversion_output() -> dict:
 
 
 def get_long_description() -> str:
-    file_path = os.path.normpath(os.path.join(current_dir, "README"))
+    file_path = os.path.normpath(os.path.join(current_dir, "README.md"))
     with open(file_path, "r") as stream:
         return stream.read()
 

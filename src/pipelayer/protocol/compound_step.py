@@ -10,6 +10,10 @@ from pipelayer.manifest import Manifest
 class CompoundStep(Protocol):
 
     @property
+    def name(self) -> str:  # pragma: no cover
+        raise NotImplementedError
+
+    @property
     def manifest(self) -> Manifest:  # pragma: no cover
         raise NotImplementedError
 

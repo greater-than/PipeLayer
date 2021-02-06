@@ -87,6 +87,7 @@ run app.py
 
 ## The Framework
 * [Pipeline](#pipeline)
+* [Switch](#switch)
 * [Filter](#filter)
 * [Context](#context)
 * [Manifest](#manifest)
@@ -139,6 +140,25 @@ The pipeline runner that iterates through the `steps` and pipes filter output to
 <br><br>
 
 
+<div id="switch"></div>
+
+### __`pipelayer.Switch`__
+___`__init__(name, pre_process, post_process)`___
+
+*args:*
+- `name: Optional[str]`<br>
+   If not specified, the class name will be used.
+- `pre_process: Optional[Callable[[Any, Context], Any]`
+- `post_process: Optional[Callable[[Any, Context], Any]`
+
+
+***Properties:***
+
+__`pre_process: Optional[Callable[[Any, Context], Any]`__<br>
+__`post_process: Optional[Callable[[Any, Context], Any]`__
+<br><br>
+
+
 <div id="filter"></div>
 
 ### __`pipelayer.Filter`__
@@ -158,9 +178,13 @@ __`post_process: Optional[Callable[[Any, Context], Any]`__
 <br><br>
 
 
-<div id="step"></div>
+<div id="compoundstep"></div>
 
-### __`pipelayer.Step(Protocol)`__
+### __`pipelayer.protocol.step.CompoundStep(Protocol)`__
+
+***Properties:***
+
+__`manifest -> Manifest`__<br>
 
 ***Methods:***
 
@@ -169,7 +193,30 @@ __`run(data, context) -> Any`__<br>
 *args:*
 
 - `data: Any`
-- `context: pipelayer.Context`
+- `context: Optional[pipelayer.Context]`
+<br><br>
+
+__`_run_steps(data, context) -> Any`__<br>
+
+*args:*
+
+- `data: Any`
+- `context: Optional[pipelayer.Context]`
+<br><br>
+
+
+<div id="step"></div>
+
+### __`pipelayer.protocol.step.Step(Protocol)`__
+
+***Methods:***
+
+__`run(data, context) -> Any`__<br>
+
+*args:*
+
+- `data: Any`
+- `context: Optional[pipelayer.Context]`
 <br><br>
 
 

@@ -1,4 +1,4 @@
-from pipelayer import StepType
+from pipelayer.step import StepType
 
 manifest_dict = {
     "name": "Pipeline",

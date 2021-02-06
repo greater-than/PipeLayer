@@ -2,6 +2,7 @@
 
 ## 0.4.0
 * Adds Switch filter
+* Adds CompoundStep interface
 
 ## 0.3.1 - 2/1/21
 * Adds support for classes that implement the `pipelayer.Step` protocol as steps

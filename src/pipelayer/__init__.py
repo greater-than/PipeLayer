@@ -5,13 +5,13 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
-from pipelayer.compound_step.protocol import CompoundStep
 from pipelayer.context import Context
 from pipelayer.exception import InvalidFilterException
 from pipelayer.filter import Filter
 from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
+from pipelayer.protocol.compound_step import CompoundStep
+from pipelayer.protocol.step import Step
 from pipelayer.step import StepType
-from pipelayer.step.protocol import Step
 
 
 class Pipeline:
@@ -147,16 +147,22 @@ class Switch:
 
     def __init__(self,
                  expression: Union[Step, Callable[[Any, Context], Any]],
-                 cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]) -> None:
+                 cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]],
+                 name: Optional[str] = "") -> None:
         self.__expression = expression
         self.__cases = cases
         self.__manifest: Manifest = None  # type: ignore
+        self.__name = name or self.__class__.__name__
 
     def __init_subclass__(cls, **kwargs: Any):
         raise TypeError(f"type '{Switch.__name__}' is not an acceptable base type")
 
     # endregion
     # region Properties
+
+    @property
+    def name(self) -> str:
+        return self.__name
 
     @property
     def expression(self) -> Union[Step, Callable[[Any, Context], Any]]:

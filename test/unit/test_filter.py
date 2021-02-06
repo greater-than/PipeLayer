@@ -6,7 +6,7 @@ class TestFilter:
 
     def test_filter_interface_implemented(self):
         from pipelayer.filter import Filter
-        from pipelayer.step.protocol import Step
+        from pipelayer.protocol.step import Step
 
         class MyFilter(Filter):
             def run(data, context):

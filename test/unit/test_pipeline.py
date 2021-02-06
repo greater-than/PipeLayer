@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from pipelayer import Filter, Pipeline, State
+from pipelayer import Filter, Pipeline
 from pipelayer.util import MockFilter
 
 
@@ -10,7 +10,7 @@ class TestPipeline:
 
     @pytest.mark.happy
     def test_pipeline_interface_implemented(self):
-        from pipelayer.compound_step.protocol import CompoundStep
+        from pipelayer.protocol.compound_step import CompoundStep
         assert isinstance(Pipeline([]), CompoundStep)
 
     @pytest.mark.happy
@@ -39,7 +39,7 @@ class TestPipeline:
         assert pipeline.manifest.name == "Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert response == '{"something": "goes here"}'
-        assert s == State.COMPLETE
+        assert s == Pipeline.State.COMPLETE
         assert isinstance(m.__dict__, dict)
 
     @pytest.mark.happy

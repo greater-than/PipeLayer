@@ -7,6 +7,8 @@
   * `pipelayer.protocol.Filter`
   * `pipelayer.protocol.Manifest`
 * Moves `Step` protocol to the `piplayer.protocol` namespace
+* Moves `Pipeline` into separate module
+* Exposes all core classes in root `__init__.py`
 * Updates LICENSE to Free BSD (previous versions still honor the MIT License)
 
 ## 0.3.1 - 2/1/21

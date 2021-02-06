@@ -125,6 +125,12 @@ A list of:
 
 ***Properties:***
 
+__`name: str`__<br>
+
+__`state: Pipeline.State`__<br>
+
+__`steps: List[Union[Step, Callable[[Any, Context], Any]]]`__<br>
+
 __`manifest: Manifest`__<br>
 An instance of [`pipelayer.Manifest`](#manifest) that is created when the run method is called.
 
@@ -143,19 +149,26 @@ The pipeline runner that iterates through the `steps` and pipes filter output to
 <div id="switch"></div>
 
 ### __`pipelayer.Switch`__
-___`__init__(name, pre_process, post_process)`___
+___`__init__(expression, cases, name)`___
 
 *args:*
+- `expression: Union[Step, Callable[[Any, Context], Any]]`
+- `cases: Dict[Union[Step, Callable[[Any, Context], Any]]]`
 - `name: Optional[str]`<br>
    If not specified, the class name will be used.
-- `pre_process: Optional[Callable[[Any, Context], Any]`
-- `post_process: Optional[Callable[[Any, Context], Any]`
 
 
 ***Properties:***
 
-__`pre_process: Optional[Callable[[Any, Context], Any]`__<br>
-__`post_process: Optional[Callable[[Any, Context], Any]`__
+__`expression: Union[Step, Callable[[Any, Context], Any]]`__<br>
+__`cases: Dict[Union[Step, Callable[[Any, Context], Any]]]`__<br>
+__`name: Optional[str]`__<br>
+__`manifest: Manifest`__
+
+***Methods:***
+
+__`run(data, context) -> Any`__<br>
+The switch runner that evaluates the specified expresssion executes the matching case.
 <br><br>
 
 
@@ -178,52 +191,10 @@ __`post_process: Optional[Callable[[Any, Context], Any]`__
 <br><br>
 
 
-<div id="compoundstep"></div>
-
-### __`pipelayer.CompoundStep(Protocol)`__
-
-***Properties:***
-
-__`manifest -> Manifest`__<br>
-
-***Methods:***
-
-__`run(data, context) -> Any`__<br>
-
-*args:*
-
-- `data: Any`
-- `context: Optional[pipelayer.Context]`
-<br><br>
-
-__`_run_steps(data, context) -> Any`__<br>
-
-*args:*
-
-- `data: Any`
-- `context: Optional[pipelayer.Context]`
-<br><br>
-
-
-<div id="step"></div>
-
-### __`pipelayer.protocol.Step(Protocol)`__
-
-***Methods:***
-
-__`run(data, context) -> Any`__<br>
-
-*args:*
-
-- `data: Any`
-- `context: Optional[pipelayer.Context]`
-<br><br>
-
-
 <div id="context"></div>
 
 ### __`pipelayer.Context`__
-A abstract base class for runtime app config.
+A abstract base class for runtime app data.
 <br><br>
 
 

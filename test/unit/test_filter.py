@@ -4,14 +4,12 @@ import pytest
 @pytest.mark.unit
 class TestFilter:
 
-    @pytest.mark.sad
-    def test_filter_subclass(self):
+    def test_filter_interface_implemented(self):
         from pipelayer.filter import Filter
-        with pytest.raises(TypeError):
-            Filter()
+        from pipelayer.step.protocol import Step
 
-    @pytest.mark.sad
-    def test_filter_run_not_implemented(self):
-        from pipelayer.filter import Filter
-        with pytest.raises(NotImplementedError):
-            Filter.run(None, None, None)
+        class MyFilter(Filter):
+            def run(data, context):
+                pass
+
+        assert isinstance(MyFilter(), Step)

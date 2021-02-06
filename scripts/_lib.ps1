@@ -259,9 +259,13 @@ function Clean_Project {
 }
 
 function Run_Unit_Tests {
+    param(
+        [string] $markers
+    )
+    if ($markers) { $markers = "unit and $markers" } else { $markers = "unit" }
     try {
         Write_Banner "Run Unit Tests"
-        $arguments = "-m pytest -m unit --nunit-xml=.test_results/unit-test-results.xml --cov=src --cov-config=pyproject.toml"
+        $arguments = "-m pytest -m ""$markers"" --nunit-xml=.test_results/unit-test-results.xml --cov=src --cov-config=pyproject.toml"
         Execute_Command "python" $arguments
     }
     catch {
@@ -272,9 +276,13 @@ function Run_Unit_Tests {
 }
 
 function Run_Integration_Tests {
+    param(
+        [string] $markers
+    )
+    if ($markers) { $markers = "integration and $markers" } else { $markers = "integration" }
     try {
-        Write_Banner "Run Unit Tests"
-        $arguments = "-m pytest -m integration --nunit-xml=.test_results/integration-test-results.xml"
+        Write_Banner "Run Integration Tests"
+        $arguments = "-m pytest -m ""$markers"" --nunit-xml=.test_results/integration-test-results.xml"
         Execute_Command "python" $arguments
     }
     catch {
@@ -299,12 +307,11 @@ function Create_Package {
 
 function Publish_Package {
     param(
-        [string] $isPyPi = $false
+        [parameter(Mandatory = $true)][boolean] $live
     )
-    $server = "testpypi"
-    if ($isPyPi) {
-        $server = "pypi"
-    }
+    if ($live) { $test = "" } else { $test = "test" }
+
+    $server = $test + "pypi"
     try {
         Write_Header "Publish Package"
         $arguments = "upload --repository $server dist/*"

@@ -1,17 +1,8 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any, Optional, Protocol, runtime_checkable
 
 from pipelayer.context import Context
-from pipelayer.enum_meta import EnumContains
-
-
-class StepType(Enum, metaclass=EnumContains):
-    PIPELINE = "Pipeline"
-    SWITCH = "Switch"
-    FILTER = "Filter"
-    FUNCTION = "Function"
 
 
 @runtime_checkable

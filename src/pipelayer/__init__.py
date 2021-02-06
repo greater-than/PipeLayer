@@ -5,12 +5,13 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
-from pipelayer.compound_step import CompoundStep
+from pipelayer.compound_step.protocol import CompoundStep
 from pipelayer.context import Context
 from pipelayer.exception import InvalidFilterException
 from pipelayer.filter import Filter
 from pipelayer.manifest import FilterManifestEntry, Manifest, ManifestEntry
-from pipelayer.step import Step, StepType
+from pipelayer.step import StepType
+from pipelayer.step.protocol import Step
 
 # region Enums
 
@@ -75,11 +76,11 @@ class Pipeline:
         The Pipeline runner
         """
         self.__state = State.RUNNING
-        data, self.__manifest = self.run_steps(data, context or Context())
+        data, self.__manifest = self._run_steps(data, context or Context())
         self.__state = State.COMPLETE
         return data
 
-    def run_steps(self, data: Any, context: Context) -> Tuple[Any, ManifestEntry]:
+    def _run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
         manifest = ManifestHelper.create_manifest(self.name)
 
         create_filter_manifest_entry = ManifestHelper.create_filter_manifest_entry
@@ -92,23 +93,23 @@ class Pipeline:
         def yield_data(data: Any, context: Context) -> Any:
             for step_name, step_type, step_func, pre_process, post_process in map(initialize_step, self.steps):
 
-                manifest_entry: Union[Manifest, FilterManifestEntry]
+                step_manifest: Union[Manifest, FilterManifestEntry]
                 if step_type in (StepType.PIPELINE, StepType.SWITCH):
-                    manifest_entry = create_manifest(step_name)
+                    step_manifest = create_manifest(step_name)
                     # nested pipeline
-                    data, manifest_entry.steps = step_func(data, context)
+                    data, step_manifest.steps = step_func(data, context)
 
                 else:
-                    manifest_entry = create_filter_manifest_entry(step_name)
+                    step_manifest = create_filter_manifest_entry(step_name)
                     # step.pre_process
-                    data, manifest_entry.pre_process = run_step_process(pre_process, data, context)
+                    data, step_manifest.pre_process = run_step_process(pre_process, data, context)
                     # step
                     data = step_func(data, context)
                     # step.post_process
-                    data, manifest_entry.post_process = run_step_process(post_process, data, context)
+                    data, step_manifest.post_process = run_step_process(post_process, data, context)
 
-                close_manifest_entry(manifest_entry)
-                add_to_manifest(manifest_entry)
+                close_manifest_entry(step_manifest)
+                add_to_manifest(step_manifest)
 
             yield data
 
@@ -137,10 +138,7 @@ class Pipeline:
 
         data = process(data, context)
 
-        manifest_entry.end = datetime.utcnow()
-        manifest_entry.duration = (
-            manifest_entry.end - manifest_entry.start
-        )
+        ManifestHelper.close_manifest_entry(manifest_entry)
 
         return data, manifest_entry
 
@@ -149,6 +147,7 @@ class Pipeline:
 
 class Switch:
     # region Constructors
+
     def __init__(self,
                  expression: Union[Step, Callable[[Any, Context], Any]],
                  cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]) -> None:
@@ -187,30 +186,35 @@ class Switch:
         Returns:
             Any: [description]
         """
-        data, self.__manifest = self.run_steps(data, context or Context())
+        data, self.__manifest = self._run_steps(data, context or Context())
         return data
 
-    def run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
+    def _run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
+
+        get_step = StepHelper.get_step
+        get_step_name = StepHelper.get_step_name
+        get_step_type = StepHelper.get_step_type
+        get_step_func = StepHelper.get_step_func
+
         manifest = ManifestHelper.create_manifest(
             StepHelper.get_step_name(self.expression),
             StepType.SWITCH
         )
 
         # Expression
-        step = StepHelper.get_step(self.expression)
-        expr_func = StepHelper.get_step_func(step)
+        step = get_step(self.expression)
+        expr_func = get_step_func(step)
 
         # Eval Expression
         label = next(case for case in self.cases if case is expr_func(data, context))
 
         # Execute Case
         case = self.cases[label]
-        case_func = StepHelper.get_step_func(case)
+        case_func = get_step_func(case)
         case_manifest_entry = ManifestHelper.create_manifest_entry(
-            StepHelper.get_step_name(case_func),
-            StepType.FUNCTION  # TODO This could be any StepType
+            get_step_name(case_func),
+            get_step_type(case_func)
         )
-
         data = case_func(data, context)
 
         ManifestHelper.close_manifest_entry(case_manifest_entry)
@@ -271,7 +275,7 @@ class StepHelper:
     @staticmethod
     def get_step_func(step: Union[Step, Callable[[Any, Context], Any]]) -> Callable[[Any, Context], Any]:
         if isinstance(step, Step):
-            run_func = step.run_steps if isinstance(step, CompoundStep) else step.run
+            run_func = step._run_steps if isinstance(step, CompoundStep) else step.run
             return cast(Callable[[Any, Context], Any], run_func)
 
         if not StepHelper.__is_callable_valid(cast(Callable, step)):

@@ -9,6 +9,11 @@ from pipelayer.util import MockFilter
 class TestPipeline:
 
     @pytest.mark.happy
+    def test_pipeline_interface_implemented(self):
+        from pipelayer.compound_step.protocol import CompoundStep
+        assert isinstance(Pipeline([]), CompoundStep)
+
+    @pytest.mark.happy
     def test_pipeline_basic(self, app_context):
 
         def first_filter_preprocess(data, context) -> dict:

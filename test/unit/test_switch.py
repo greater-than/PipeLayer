@@ -47,11 +47,18 @@ switch = Switch(
 class TestSwitch:
 
     @pytest.mark.happy
+    def test_switch_interface_implemented(self):
+        from pipelayer.compound_step.protocol import CompoundStep
+        assert isinstance(Switch(None, []), CompoundStep)
+
+    @pytest.mark.happy
     def test_switch_in_pipeline(self):
 
-        pipeline = Pipeline([switch])
+        pipeline = Pipeline([
+            switch
+        ])
 
-        data = pipeline.run(Car(), Context())
+        data = pipeline.run(data=Car(), context=Context())
         sm = switch.manifest
 
         assert sm

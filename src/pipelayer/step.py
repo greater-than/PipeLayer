@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 from enum import Enum
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Tuple, Type, Union, cast
 
 from pipelayer.enum_meta import EnumContains
 from pipelayer.exception import InvalidFilterException
@@ -87,7 +87,12 @@ class StepHelper:
 
     @staticmethod
     def __is_run_static(step: Step) -> bool:
-        return inspect.getfullargspec(step.run).args[0] != "self"
+        for cls in inspect.getmro(cast(Type, step)):
+            if inspect.isroutine(step.run) \
+                    and step.run.__name__ in cls.__dict__ \
+                    and isinstance(cls.__dict__[step.run.__name__], staticmethod):
+                return True
+        return False
 
     @staticmethod
     def __is_callable_valid(obj: Callable[..., Any]) -> bool:

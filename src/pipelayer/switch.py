@@ -1,21 +1,33 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
 
 from pipelayer.context import Context
+from pipelayer.enum import StepType
 from pipelayer.manifest import Manifest, ManifestManager
 from pipelayer.protocol import Step
-from pipelayer.step import StepHelper, StepType
+from pipelayer.step import StepHelper
 
 
 class Switch:
+    """
+    A Switch/Case filter. It implements the CompoundStep interface.
+    """
     # region Constructors
 
     def __init__(self,
                  expression: Union[Step, Callable[[Any, Context], Any]],
                  cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]],
                  name: Optional[str] = "") -> None:
+        """
+        Args:
+            expression (Union[Step, Callable[[Any, Context], Any]]): The switch expresssion:
+            Can be a class that implements pipelayer.protocol.Step or a function/lambda that
+            has the signature (data: Any, context; Context) -> Any.
+            cases (Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]): The list of labels and cases (Step)
+            name (Optional[str], optional): Used by the Manifest. Defaults to "".
+        """
         self.__expression = expression
         self.__cases = cases
         self.__manifest: Manifest = None  # type: ignore
@@ -56,20 +68,20 @@ class Switch:
         Returns:
             Any: [description]
         """
-        data, self.__manifest = self._run_steps(data, context or Context())
+        data, self.__manifest = self._run(data, context or Context())
         return data
 
-    def _run_steps(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
+    def _run(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
 
         get_step = StepHelper.get_step
         get_step_name = StepHelper.get_step_name
         get_step_type = StepHelper.get_step_type
         get_step_func = StepHelper.get_step_func
 
-        manifest = ManifestManager.create_manifest(
+        manifest = cast(Manifest, ManifestManager.create(
             StepHelper.get_step_name(self.expression),
             StepType.SWITCH
-        )
+        ))
 
         # Expression
         step = get_step(self.expression)
@@ -81,16 +93,16 @@ class Switch:
         # Execute Case
         case = self.cases[label]
         case_func = get_step_func(case)
-        case_manifest_entry = ManifestManager.create_manifest_entry(
+        case_manifest = ManifestManager.create(
             get_step_name(case_func),
             get_step_type(case_func)
         )
         data = case_func(data, context)
 
-        ManifestManager.close_manifest_entry(case_manifest_entry)
-        manifest.steps.append(case_manifest_entry)
+        ManifestManager.close(case_manifest)
+        manifest.steps.append(case_manifest)
 
-        ManifestManager.close_manifest_entry(manifest)
+        ManifestManager.close(manifest)
         self.__manifest = manifest
 
         return data, manifest

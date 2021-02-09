@@ -1,5 +1,11 @@
 # PipeLayer: Version History
 
+## 0.5.0
+* Adds start/exit/filter events to `pipelayer.Filter`
+* `pipelayer.Pipeline` terminates the pipeline if the Filter.exit event is raised
+* Adds raise_event decorator to wrap the `run` method in an implementation of `pipeline.Filter`
+* consolidates create methods in `pipelayer.ManifestHelper`
+
 ## 0.4.0
 * Adds Switch filter
 * Adds protocols:

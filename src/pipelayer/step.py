@@ -1,19 +1,11 @@
 from __future__ import annotations
 
 import inspect
-from enum import Enum
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Callable, Optional, Tuple, Type, Union, cast
 
-from pipelayer.enum_meta import EnumContains
+from pipelayer.enum import StepType
 from pipelayer.exception import InvalidFilterException
 from pipelayer.protocol import CompoundStep, Filter, Step
-
-
-class StepType(Enum, metaclass=EnumContains):
-    PIPELINE = "Pipeline"
-    SWITCH = "Switch"
-    FILTER = "Filter"
-    FUNCTION = "Function"
 
 
 class StepHelper:
@@ -22,6 +14,7 @@ class StepHelper:
     def initialize_step(
         step: Union[Step, Callable[[Any, Any], Any]]
     ) -> Tuple[
+        Union[Filter, Step, Callable[[Any, Any], Any]],
         str,
         StepType,
         Callable[[Any, Any], Any],
@@ -32,7 +25,7 @@ class StepHelper:
         step_type = StepHelper.get_step_type(step)
         step_func = StepHelper.get_step_func(step)
         pre, post = StepHelper.get_sub_processes(step)
-        return StepHelper.get_step_name(step), step_type, step_func, pre, post
+        return step, StepHelper.get_step_name(step), step_type, step_func, pre, post
 
     @staticmethod
     def get_step(step: Union[Step, Callable[[Any, Any], Any]]) -> Union[Step, Callable[[Any, Any], Any]]:
@@ -56,6 +49,8 @@ class StepHelper:
 
     @staticmethod
     def get_step_type(step: Union[Step, Callable[[Any, Any], Any]]) -> StepType:
+        if isinstance(step, Filter):
+            return StepType.FILTER
         if isinstance(step, Step):
             return StepType(step.__class__.__name__) if step.__class__.__name__ in StepType else StepType.FILTER
         return StepType.FUNCTION
@@ -63,7 +58,7 @@ class StepHelper:
     @staticmethod
     def get_step_func(step: Union[Step, Callable[[Any, Any], Any]]) -> Callable[[Any, Any], Any]:
         if isinstance(step, Step):
-            run_func = step._run_steps if isinstance(step, CompoundStep) else step.run
+            run_func = step._run if isinstance(step, CompoundStep) else step.run
             return cast(Callable[[Any, Any], Any], run_func)
 
         if not StepHelper.__is_callable_valid(cast(Callable, step)):
@@ -83,11 +78,17 @@ class StepHelper:
 
     @staticmethod
     def __is_step_type(step: Union[Step, Callable[[Any, Any], Any]]) -> bool:
-        return inspect.isclass(step) and issubclass(cast(type, step), Step)
+        return_val = inspect.isclass(step) and issubclass(cast(type, step), Step)
+        return return_val
 
     @staticmethod
     def __is_run_static(step: Step) -> bool:
-        return inspect.getfullargspec(step.run).args[0] != "self"
+        for cls in inspect.getmro(cast(Type, step)):
+            if inspect.isroutine(step.run) \
+                    and step.run.__name__ in cls.__dict__ \
+                    and isinstance(cls.__dict__[step.run.__name__], staticmethod):
+                return True
+        return False
 
     @staticmethod
     def __is_callable_valid(obj: Callable[..., Any]) -> bool:

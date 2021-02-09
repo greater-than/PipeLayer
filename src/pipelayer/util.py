@@ -1,21 +1,9 @@
 import json
-from typing import Any, Optional
 
-from pipelayer.context import Context
-from pipelayer.filter import Filter
-from pipelayer.manifest import ManifestEntry
+from pipelayer.manifest import StepManifest
 
 
-class MockFilter(Filter):
-    """
-    For patching pipeline filters in unit tests
-    """
-
-    def run(self, data: Any, context: Optional[Context] = None) -> Any:
-        return data
-
-
-def render_manifest(manifest: ManifestEntry, indent: int = 2) -> str:
+def render_manifest(manifest: StepManifest, indent: int = 2) -> str:
     """
     Renders a formatted Manifest
     """

@@ -1,17 +1,17 @@
 from datetime import datetime, timedelta
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
-from pipelayer.step import StepType
+from pipelayer.enum import StepType
 from pydantic import BaseModel
 from pydantic.json import timedelta_isoformat
 from stringbender import camel
 
 
-class ManifestEntryList(list):
+class ManifestList(list):
     ...
 
 
-class ManifestEntry(BaseModel):
+class StepManifest(BaseModel):
     name: str
     step_type: StepType
     start: datetime
@@ -28,46 +28,51 @@ class ManifestEntry(BaseModel):
         alias_generator: Callable = camel
 
 
-class CompoundStepManifestEntry(ManifestEntry):
-    steps: ManifestEntryList = ManifestEntryList()
+class _CompoundStepManifest(StepManifest):
+    steps: ManifestList = ManifestList()
 
 
-class FilterManifestEntry(CompoundStepManifestEntry):
+class FilterManifest(_CompoundStepManifest):
     step_type: StepType = StepType.FILTER
-    pre_process: Optional[ManifestEntry]
-    post_process: Optional[ManifestEntry]
+    pre_process: Optional[StepManifest]
+    post_process: Optional[StepManifest]
 
 
-class Manifest(CompoundStepManifestEntry):
+class Manifest(_CompoundStepManifest):
     """
     A running log of pipeline activity
     """
-    step_type: StepType
+    pass
 
 
 class ManifestManager:
 
     @staticmethod
-    def create_manifest(name: str, step_type: Optional[StepType] = StepType.PIPELINE) -> Manifest:
+    def create(name: str, step_type: StepType) -> Union[Manifest, FilterManifest, StepManifest]:
+        if step_type is StepType.FILTER:
+            return FilterManifest(
+                name=name,
+                step_type=StepType.FILTER,
+                start=datetime.utcnow())
+
+        if step_type is StepType.SWITCH:
+            return Manifest(
+                name=name,
+                step_type=StepType.SWITCH,
+                start=datetime.utcnow())
+
+        if step_type is StepType.FUNCTION:
+            return StepManifest(
+                name=name,
+                step_type=StepType.FUNCTION,
+                start=datetime.utcnow())
+
         return Manifest(
             name=name,
-            step_type=step_type or StepType.PIPELINE,
+            step_type=StepType.PIPELINE,
             start=datetime.utcnow())
 
     @staticmethod
-    def create_filter_manifest_entry(name: str) -> FilterManifestEntry:
-        return FilterManifestEntry(
-            name=name,
-            start=datetime.utcnow())
-
-    @staticmethod
-    def create_manifest_entry(name: str, step_type: StepType) -> ManifestEntry:
-        return ManifestEntry(
-            name=name,
-            step_type=step_type,
-            start=datetime.utcnow())
-
-    @staticmethod
-    def close_manifest_entry(manifest_entry: ManifestEntry) -> None:
-        manifest_entry.end = datetime.utcnow()
-        manifest_entry.duration = manifest_entry.end - manifest_entry.start
+    def close(manifest: StepManifest) -> None:
+        manifest.end = datetime.utcnow()
+        manifest.duration = manifest.end - manifest.start

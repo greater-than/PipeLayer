@@ -38,7 +38,7 @@ def get_requirements() -> list:
 
 setup_args = {
     "name": "pipelayer",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "A lightweight pipeline framework",
     "long_description": get_long_description(),
     "long_description_content_type": "text/markdown",

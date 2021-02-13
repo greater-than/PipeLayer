@@ -48,8 +48,8 @@ class TestSwitch:
 
     @pytest.mark.happy
     def test_switch_interface_implemented(self):
-        from pipelayer.protocol import CompoundStep
-        assert isinstance(Switch(None, []), CompoundStep)
+        from pipelayer.protocol import ICompoundStep
+        assert isinstance(Switch(None, []), ICompoundStep)
 
     @pytest.mark.happy
     def test_switch_in_pipeline(self):

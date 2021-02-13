@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from pipelayer import Action, Filter, Pipeline
-from pipelayer.event_args import EventArgs
+from pipelayer import Action, Filter, FilterEventArgs, Pipeline
 from pipelayer.filter import raise_events
 
 
@@ -18,7 +17,7 @@ class TestFilterEvents:
             def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
-        def myfilter_start(sender: object, args: EventArgs) -> None:
+        def myfilter_start(sender: object, args: FilterEventArgs) -> None:
             args.action = Action.EXIT
 
         f = MyFilter()
@@ -39,7 +38,7 @@ class TestFilterEvents:
             def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
-        def myfilter_end(sender: object, args: EventArgs) -> None:
+        def myfilter_end(sender: object, args: FilterEventArgs) -> None:
             args.data = None
             args.action = Action.EXIT
 

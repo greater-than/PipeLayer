@@ -18,21 +18,43 @@ class TestStepHelper:
 
     @pytest.mark.sad
     def test_is_callable_valid_false(self):
-        assert StepHelper._StepHelper__is_callable_valid(None) is False
-        assert StepHelper._StepHelper__is_callable_valid("test") is False
+        assert StepHelper.is_callable_valid(None) is False
+        assert StepHelper.is_callable_valid("test") is False
 
     @pytest.mark.sad
-    def test_is_run_static_false(self):
+    def test_is_class_func_static_false(self):
         class MyClass:
             def run(self, data, context):
                 pass
 
-        assert StepHelper._StepHelper__is_run_static(MyClass) is False
+        assert StepHelper._StepHelper__is_class_func_static(MyClass) is False
 
     @pytest.mark.sad
-    def test_is_run_static_type_error(self):
+    def test_is_class_func_static_type_error(self):
         class MyClass:
             pass
 
         with pytest.raises(AttributeError):
-            StepHelper._StepHelper__is_run_static(MyClass)
+            StepHelper._StepHelper__is_class_func_static(MyClass)
+
+    @pytest.mark.happy
+    def test_is_class_func_static(self):
+        from pipelayer.filter import Filter
+
+        class MyClass(Filter):
+            @staticmethod
+            def run(data, context):
+                pass
+
+        assert StepHelper._StepHelper__is_class_func_static(MyClass)
+
+    @pytest.mark.happy
+    def test_is_class_func_static_using_instance(self):
+        from pipelayer.filter import Filter
+
+        class MyClass(Filter):
+            @staticmethod
+            def run(data, context):
+                pass
+
+        assert StepHelper._StepHelper__is_class_func_static(type(MyClass()))

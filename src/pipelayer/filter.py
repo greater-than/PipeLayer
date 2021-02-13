@@ -6,7 +6,7 @@ from typing import Any, Callable, List, Optional
 
 from pipelayer.context import Context
 from pipelayer.enum import Action, State
-from pipelayer.event_args import EventArgs
+from pipelayer.event_args import FilterEventArgs
 
 
 def raise_events(func: Callable) -> Callable:
@@ -16,7 +16,7 @@ def raise_events(func: Callable) -> Callable:
         data: Any = args[1]
         context: Context = args[2]
 
-        evt_args = EventArgs(data, context, State.RUNNING)
+        evt_args = FilterEventArgs(data, context, State.RUNNING)
 
         filter._on_start(evt_args)
 
@@ -27,7 +27,7 @@ def raise_events(func: Callable) -> Callable:
 
         data = func(*args, **kwargs)
 
-        evt_args = EventArgs(data, args[2], State.COMPLETING)
+        evt_args = FilterEventArgs(data, args[2], State.COMPLETING)
         filter._on_end(evt_args)
 
         if evt_args.action is Action.EXIT:
@@ -75,19 +75,19 @@ class Filter(ABC):
     # region Events
 
     @property
-    def start(self) -> List[Callable[[Filter, EventArgs], Any]]:
+    def start(self) -> List[Callable[[Filter, FilterEventArgs], Any]]:
         if not self.__start:
             self.__start = []
         return self.__start
 
     @property
-    def exit(self) -> List[Callable[[Filter, EventArgs], Any]]:
+    def exit(self) -> List[Callable[[Filter, FilterEventArgs], Any]]:
         if not self.__exit:
             self.__exit = []
         return self.__exit
 
     @property
-    def end(self) -> List[Callable[[Filter, EventArgs], Any]]:
+    def end(self) -> List[Callable[[Filter, FilterEventArgs], Any]]:
         if not self.__end:
             self.__end = []
         return self.__end
@@ -104,13 +104,13 @@ class Filter(ABC):
     # endregion
     # region Events
 
-    def _on_start(self, args: EventArgs) -> None:
+    def _on_start(self, args: FilterEventArgs) -> None:
         [e(self, args) for e in self.start]
 
-    def _on_exit(self, args: EventArgs) -> None:
+    def _on_exit(self, args: FilterEventArgs) -> None:
         [e(self, args) for e in self.exit]
 
-    def _on_end(self, args: EventArgs) -> None:
+    def _on_end(self, args: FilterEventArgs) -> None:
         [e(self, args) for e in self.end]
 
     # endregion

@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
 from pipelayer.context import Context
 from pipelayer.enum import StepType
 from pipelayer.manifest import Manifest, ManifestManager
-from pipelayer.protocol import Step
+from pipelayer.protocol import IStep
 from pipelayer.step import StepHelper
 
 
@@ -17,8 +17,8 @@ class Switch:
     # region Constructors
 
     def __init__(self,
-                 expression: Union[Step, Callable[[Any, Context], Any]],
-                 cases: Dict[Enum, Union[Step, Callable[[Any, Context], Any]]],
+                 expression: Union[IStep, Callable[[Any, Context], Any]],
+                 cases: Dict[Enum, Union[IStep, Callable[[Any, Context], Any]]],
                  name: Optional[str] = "") -> None:
         """
         Args:
@@ -44,11 +44,11 @@ class Switch:
         return self.__name
 
     @property
-    def expression(self) -> Union[Step, Callable[[Any, Context], Any]]:
+    def expression(self) -> Union[IStep, Callable[[Any, Context], Any]]:
         return self.__expression
 
     @property
-    def cases(self) -> Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]:
+    def cases(self) -> Dict[Enum, Union[IStep, Callable[[Any, Context], Any]]]:
         return self.__cases
 
     @property

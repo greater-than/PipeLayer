@@ -4,10 +4,10 @@ from typing import Any, Callable, List, Optional, Tuple, Union, cast
 
 from pipelayer.context import Context
 from pipelayer.enum import Action, StepType
-from pipelayer.event_args import EventArgs
+from pipelayer.event_args import FilterEventArgs
 from pipelayer.manifest import (FilterManifest, Manifest, ManifestManager,
                                 StepManifest)
-from pipelayer.protocol import Filter, Step
+from pipelayer.protocol import IFilter, IStep
 from pipelayer.step import StepHelper
 from pipelayer.switch import Switch  # NOQA F401
 
@@ -16,10 +16,10 @@ class Pipeline:
     # region Constructors
 
     def __init__(self: Pipeline,
-                 steps: List[Union[Step, Callable[[Any, Context], Any]]],
+                 steps: List[Union[IStep, Callable[[Any, Context], Any]]],
                  name: str = "") -> None:
         self.__name = name or self.__class__.__name__
-        self.__steps: List[Union[Step, Callable[[Any, Context], Any]]] = steps
+        self.__steps: List[Union[IStep, Callable[[Any, Context], Any]]] = steps
         self.__manifest: Manifest = None  # type: ignore
         self.__exit_pipeline: bool = False
 
@@ -34,7 +34,7 @@ class Pipeline:
         return self.__name
 
     @property
-    def steps(self) -> List[Union[Step, Callable[[Any, Context], Any]]]:
+    def steps(self) -> List[Union[IStep, Callable[[Any, Context], Any]]]:
         return self.__steps
 
     @property
@@ -67,7 +67,7 @@ class Pipeline:
             if step_type in (StepType.PIPELINE, StepType.SWITCH):
                 data, cast(Manifest, step_manifest).steps = step_func(data, context)
 
-            elif isinstance(step, Filter):
+            elif isinstance(step, IFilter):
                 # step.pre_process
                 data, cast(FilterManifest, step_manifest).pre_process = \
                     run_step_process(pre_process, data, context)
@@ -96,7 +96,7 @@ class Pipeline:
 
         return data, manifest
 
-    def __handle_exit(self, sender: Filter, args: EventArgs) -> None:
+    def __handle_exit(self, sender: IFilter, args: FilterEventArgs) -> None:
         if args.action is Action.EXIT:
             self.__exit_pipeline = True
 

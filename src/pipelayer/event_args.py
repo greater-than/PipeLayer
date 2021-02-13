@@ -6,9 +6,9 @@ from pipelayer.context import Context
 from pipelayer.enum import Action, State
 
 
-class EventArgs:
+class FilterEventArgs:
     def __init__(
-        self: EventArgs, data: Any, context: Context, state: State
+        self, data: Any, context: Context, state: State
     ) -> None:
         self.__data = data
         self.__context = context

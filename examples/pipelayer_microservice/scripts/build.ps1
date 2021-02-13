@@ -5,7 +5,6 @@ Clean_Project
 
 Setup_Venv
 Install_Requirements
-Install_Tools
 
 Run_PreCommit_Checks
 Run_Unit_Tests

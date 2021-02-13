@@ -10,8 +10,8 @@ class TestPipeline:
 
     @pytest.mark.happy
     def test_pipeline_interface_implemented(self):
-        from pipelayer.protocol import CompoundStep
-        assert isinstance(Pipeline([]), CompoundStep)
+        from pipelayer.protocol import ICompoundStep
+        assert isinstance(Pipeline([]), ICompoundStep)
 
     @pytest.mark.happy
     def test_pipeline_basic(self, app_context):
@@ -98,7 +98,7 @@ class TestPipeline:
             def run(data, context) -> dict:
                 return data
 
-        class SixthFilter:
+        class SixthFilter(Filter):
             @staticmethod
             def run(data, context) -> dict:
                 return data

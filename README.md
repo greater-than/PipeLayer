@@ -90,7 +90,7 @@ run app.py
 * [Switch](#switch)
 * [Filter](#filter)
   * [Events](#filterevents)
-  * [EventArgs](#eventargs)
+  * [FilterEventArgs](#eventargs)
 * [Context](#context)
 * [Manifest](#manifest)
 * [Utilities](#utilities)
@@ -201,7 +201,7 @@ __`start: List[Callable[[Filter, Any], Any]]`__<br>
 Raised before the `run` method is invoked.
 
 __`exit: List[Callable[[Filter, Any], Any]]`__<br>
-Raised if `EventArgs.action` is set to `Action.SKIP` or `Action.EXIT` in either a `start` or `stop` event handler.
+Raised if `action` is set to `Action.SKIP` or `Action.EXIT` in either a `start` or `stop` event handler.
 
 __`end: List[Callable[[Filter, Any], Any]]`__<br>
 Raised after the `run` method is invoked.
@@ -210,7 +210,7 @@ Raised after the `run` method is invoked.
 
 <div id="eventargs"></div>
 
-### __`pipelayer.EventArgs`__
+### __`pipelayer.FilterEventArgs`__
 ___`__init__(data, context, state)`___
 
 *args:*

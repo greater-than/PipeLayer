@@ -6,10 +6,11 @@ from typing import (Any, Callable, List, Optional, Protocol, Tuple,
                     runtime_checkable)
 
 from pipelayer.context import Context
+from pipelayer.event_args import FilterEventArgs
 
 
 @runtime_checkable
-class Manifest(Protocol):  # pragma: no cover
+class IManifest(Protocol):  # pragma: no cover
     name: str
     step_type: Enum
     steps: List
@@ -19,42 +20,83 @@ class Manifest(Protocol):  # pragma: no cover
 
 
 @runtime_checkable
-class Step(Protocol):  # pragma: no cover
-    def run(self, data: Any, context: Optional[Context]) -> Any:
-        raise NotImplementedError
+class IStepManifest(Protocol):  # pragma: no cover
+    name: str
+    step_type: Enum
+    start: datetime
+    end: Optional[datetime]
+    duration: Optional[datetime]
 
 
 @runtime_checkable
-class Filter(Protocol):  # pragma: no cover
+class IFilterManifest(Protocol):  # pragma: no cover
+    name: str
+    step_type: Enum
+    start: datetime
+    end: Optional[datetime]
+    duration: Optional[datetime]
+    pre_process: Optional[IStepManifest]
+    post_process: Optional[IStepManifest]
+
+
+@runtime_checkable
+class IStep(Protocol):  # pragma: no cover
+    def run(self, data: Any, context: Optional[Context]) -> Any:
+        pass
+
+
+@runtime_checkable
+class IFilter(Protocol):  # pragma: no cover
     @property
     def name(self) -> str:
-        raise NotImplementedError
+        pass
 
     @property
     def pre_process(self) -> Optional[Callable]:
-        raise NotImplementedError
+        pass
 
     @property
     def post_process(self) -> Optional[Callable]:
-        raise NotImplementedError
+        pass
+
+    @property
+    def start(self) -> List[Callable[[IFilter, Any], Any]]:
+        pass
+
+    @property
+    def exit(self) -> List[Callable[[IFilter, Any], Any]]:
+        pass
+
+    @property
+    def end(self) -> List[Callable[[IFilter, Any], Any]]:
+        pass
 
     def run(self, data: Any, context: Any) -> Any:
-        raise NotImplementedError
+        pass
+
+    def _on_start(self, args: FilterEventArgs) -> None:
+        pass
+
+    def _on_exit(self, args: FilterEventArgs) -> None:
+        pass
+
+    def _on_end(self, args: FilterEventArgs) -> None:
+        pass
 
 
 @runtime_checkable
-class CompoundStep(Protocol):  # pragma: no cover
+class ICompoundStep(Protocol):  # pragma: no cover
 
     @property
     def name(self) -> str:
         pass
 
     @property
-    def manifest(self) -> Manifest:
+    def manifest(self) -> IManifest:
         pass
 
     def run(self, data: Any, context: Any) -> Any:
         pass
 
-    def _run_steps(self, data: Any, context: Any) -> Tuple[Any, Manifest]:
+    def _run(self, data: Any, context: Any) -> Tuple[Any, IManifest]:
         pass

@@ -89,6 +89,8 @@ run app.py
 * [Pipeline](#pipeline)
 * [Switch](#switch)
 * [Filter](#filter)
+  * [Events](#filterevents)
+  * [FilterEventArgs](#eventargs)
 * [Context](#context)
 * [Manifest](#manifest)
 * [Utilities](#utilities)
@@ -188,9 +190,33 @@ ___`__init__(name, pre_process, post_process)`___
 ***Properties:***
 
 __`pre_process: Optional[Callable[[Any, Context], Any]`__<br>
-__`post_process: Optional[Callable[[Any, Context], Any]`__
+__`post_process: Optional[Callable[[Any, Context], Any]`__<br>
+
+<div id="filterevents"></div>
+
+***Events:***<br>
+Events are lists of callables assignable after instantiation and are raised if the `pipelayer.filter.raise_events` decorator is applied to the implementation of the `run` method.
+
+__`start: List[Callable[[Filter, Any], Any]]`__<br>
+Raised before the `run` method is invoked.
+
+__`exit: List[Callable[[Filter, Any], Any]]`__<br>
+Raised if `action` is set to `Action.SKIP` or `Action.EXIT` in either a `start` or `stop` event handler.
+
+__`end: List[Callable[[Filter, Any], Any]]`__<br>
+Raised after the `run` method is invoked.
 <br><br>
 
+
+<div id="eventargs"></div>
+
+### __`pipelayer.FilterEventArgs`__
+___`__init__(data, context, state)`___
+
+*args:*
+- `data: Any`<br>
+- `context: Context`
+- `state: State`<br><br>
 
 <div id="context"></div>
 

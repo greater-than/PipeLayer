@@ -1,37 +1,36 @@
 import json
 
 import requests
-from service.config import AppContext
+
+from service.config import IAppContext
 from service.model.request_model import (ListRequest, UserListRequest,
                                          UserRequest, UserSearchRequest)
+from service.provider.user import IUserProvider
 
 
-class ResReq:
+class ResReqUserProvider(IUserProvider):
 
-    @staticmethod
-    def get_user(request: UserRequest, context: AppContext) -> dict:
-        req = f"{context.settings.resreq_api}/{request.api_name}/{request.id}"
+    def get_user(request: UserRequest, context: IAppContext) -> dict:
+        req = f"{context.settings.user_service_api}/{request.api_name}/{request.id}"
         resreq_resp = requests.get(req)
         user = json.loads(resreq_resp.content)
         context.log.info("User received from ResReq")
         return user
 
-    @staticmethod
-    def get_users(request: UserListRequest, context: AppContext) -> dict:
-        users = ResReq.get_resreq_list(request, context)
+    def get_users(request: UserListRequest, context: IAppContext) -> dict:
+        users = ResReqUserProvider.get_resreq_list(request, context)
         context.log.info("Users received from ResReq")
         return users
 
-    @staticmethod
-    def find_users(request: UserSearchRequest, context: AppContext) -> dict:
-        users = ResReq.get_resreq_list(request, context)
+    def find_users(request: UserSearchRequest, context: IAppContext) -> dict:
+        users = ResReqUserProvider.get_resreq_list(request, context)
 
         total = users["total"]
         items_remaining = total - (len(users["data"]) * request.per_page)
 
         if request.search_all and items_remaining > 0:
             remaining_items_request = ListRequest(page=request.page + 1, per_page=items_remaining)
-            users["data"].append(ResReq.get_resreq_users(remaining_items_request, context)["data"])
+            users["data"].append(ResReqUserProvider.get_users(remaining_items_request, context)["data"])
 
         users["data"] = [
             user for user in users["data"]
@@ -44,8 +43,7 @@ class ResReq:
         context.log.info("Users received from ResReq")
         return users
 
-    @staticmethod
-    def get_resreq_list(request: ListRequest, context: AppContext) -> dict:
-        req = f"{context.settings.resreq_api}/{request.api_name}?page={request.page}&per_page={request.per_page}"
+    def get_resreq_list(request: ListRequest, context: IAppContext) -> dict:
+        req = f"{context.settings.user_service_api}/{request.api_name}?page={request.page}&per_page={request.per_page}"
         resreq_resp = requests.get(req)
         return json.loads(resreq_resp.content)

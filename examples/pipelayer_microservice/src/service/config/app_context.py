@@ -1,15 +1,20 @@
-from logging import Logger
-from typing import Any
+from __future__ import annotations
+
+from logging import DEBUG, Logger, getLogger
+from typing import Optional
 
 from pipelayer import Context
-from service.config.app_settings import AppSettings
+
+from service.config.app_settings_base import AppSettings
+
+debug_logger = getLogger("Debug Logger")
+debug_logger.setLevel(DEBUG)
 
 
 class AppContext(Context):
-    def __init__(self, settings: AppSettings, log: Logger):
+    def __init__(self, settings: AppSettings, log: Optional[Logger] = debug_logger) -> None:
         self.__settings = settings
         self.__log = log
-        self.__request = None
 
     @property
     def settings(self) -> AppSettings:
@@ -18,11 +23,3 @@ class AppContext(Context):
     @property
     def log(self) -> Logger:
         return self.__log
-
-    @property
-    def request(self) -> Any:
-        return self.__request
-
-    @request.setter
-    def request(self, value: Any):
-        self.__request = value

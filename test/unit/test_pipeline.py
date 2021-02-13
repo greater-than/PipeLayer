@@ -2,7 +2,7 @@ import json
 
 import pytest
 from pipelayer import Filter, Pipeline
-from pipelayer.util import MockFilter
+from pipelayer.filter import raise_events
 
 
 @pytest.mark.unit
@@ -10,8 +10,8 @@ class TestPipeline:
 
     @pytest.mark.happy
     def test_pipeline_interface_implemented(self):
-        from pipelayer.protocol import CompoundStep
-        assert isinstance(Pipeline([]), CompoundStep)
+        from pipelayer.protocol import ICompoundStep
+        assert isinstance(Pipeline([]), ICompoundStep)
 
     @pytest.mark.happy
     def test_pipeline_basic(self, app_context):
@@ -20,6 +20,7 @@ class TestPipeline:
             return data
 
         class FirstFilter(Filter):
+            @raise_events
             def run(self, data, context) -> dict:
                 return {"something": "goes here"}
 
@@ -33,13 +34,11 @@ class TestPipeline:
         pipeline = Pipeline(steps)
         response = pipeline.run(None)
         m = pipeline.manifest
-        s = pipeline.state
 
         assert pipeline.name == "Pipeline"
         assert pipeline.manifest.name == "Pipeline"
         assert pipeline.manifest.steps[0].name == "FirstFilter"
         assert response == '{"something": "goes here"}'
-        assert s == Pipeline.State.COMPLETE
         assert isinstance(m.__dict__, dict)
 
     @pytest.mark.happy
@@ -99,7 +98,7 @@ class TestPipeline:
             def run(data, context) -> dict:
                 return data
 
-        class SixthFilter:
+        class SixthFilter(Filter):
             @staticmethod
             def run(data, context) -> dict:
                 return data
@@ -151,10 +150,12 @@ class TestPipeline:
 
     @pytest.mark.sad
     def test_pre_process_raises_exception(self):
-
         def none_type_func(data, context):
             raise TypeError("You're not my type.")
 
+        class MockFilter(Filter):
+            def run(self, data, context):
+                return data
         steps = [MockFilter(pre_process=none_type_func)]
         pipeline = Pipeline(None)
 
@@ -165,10 +166,12 @@ class TestPipeline:
 
     @pytest.mark.sad
     def test_post_process_raises_exception(self):
-        from pipelayer.util import MockFilter
-
         def none_type_func(data, context):
             raise TypeError("You're not my type either.")
+
+        class MockFilter(Filter):
+            def run(self, data, context):
+                return data
 
         pipeline = Pipeline([MockFilter(post_process=none_type_func)])
 

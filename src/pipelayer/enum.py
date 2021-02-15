@@ -36,3 +36,4 @@ class StepType(Enum, metaclass=EnumContains):
     SWITCH = "Switch"
     FILTER = "Filter"
     FUNCTION = "Function"
+    UNDEFINED = "Undefined"

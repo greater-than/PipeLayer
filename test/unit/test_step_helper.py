@@ -17,6 +17,12 @@ class TestStepHelper:
             StepHelper.initialize_step(lambda a, b, c: a + b + c)
 
     @pytest.mark.sad
+    def test_is_callable_valid(self):
+        def func(data, Context):
+            return True
+        assert StepHelper.is_callable_valid(func)
+
+    @pytest.mark.sad
     def test_is_callable_valid_false(self):
         assert StepHelper.is_callable_valid(None) is False
         assert StepHelper.is_callable_valid("test") is False

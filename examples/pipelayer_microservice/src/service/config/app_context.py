@@ -4,7 +4,6 @@ from logging import DEBUG, Logger, getLogger
 from typing import Optional
 
 from pipelayer import Context
-
 from service.config.app_settings_base import AppSettings
 
 debug_logger = getLogger("Debug Logger")

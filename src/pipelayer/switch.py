@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
-from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
+from typing import Any, Dict, Optional, Tuple, Union, cast
+from uuid import uuid4
 
 from pipelayer.context import Context
 from pipelayer.enum import StepType
 from pipelayer.manifest import Manifest, ManifestManager
-from pipelayer.protocol import IStep
+from pipelayer.protocol import IStep, PipelineCallableT
 from pipelayer.step import StepHelper
 
 
@@ -17,21 +17,22 @@ class Switch:
     # region Constructors
 
     def __init__(self,
-                 expression: Union[IStep, Callable[[Any, Context], Any]],
-                 cases: Dict[Enum, Union[IStep, Callable[[Any, Context], Any]]],
+                 expression: Union[IStep, PipelineCallableT],
+                 cases: Dict[Any, Union[IStep, PipelineCallableT]],
                  name: Optional[str] = "") -> None:
         """
         Args:
-            expression (Union[Step, Callable[[Any, Context], Any]]): The switch expresssion:
+            expression (Union[Step, PipelineCallableT]): The switch expresssion:
             Can be a class that implements pipelayer.protocol.Step or a function/lambda that
             has the signature (data: Any, context; Context) -> Any.
-            cases (Dict[Enum, Union[Step, Callable[[Any, Context], Any]]]): The list of labels and cases (Step)
+            cases (Dict[Any, Union[Step, PipelineCallableT]]): The list of labels and cases (Step)
             name (Optional[str], optional): Used by the Manifest. Defaults to "".
         """
         self.__expression = expression
         self.__cases = cases
-        self.__manifest: Manifest = None  # type: ignore
+        self.__manifest: Optional[Manifest] = None
         self.__name = name or self.__class__.__name__
+        self.default = uuid4().hex
 
     def __init_subclass__(cls, **kwargs: Any):
         raise TypeError(f"type '{Switch.__name__}' is not an acceptable base type")
@@ -44,16 +45,16 @@ class Switch:
         return self.__name
 
     @property
-    def expression(self) -> Union[IStep, Callable[[Any, Context], Any]]:
+    def expression(self) -> Union[IStep, PipelineCallableT]:
         return self.__expression
 
     @property
-    def cases(self) -> Dict[Enum, Union[IStep, Callable[[Any, Context], Any]]]:
+    def cases(self) -> Dict[Any, Union[IStep, PipelineCallableT]]:
         return self.__cases
 
     @property
     def manifest(self) -> Manifest:
-        return self.__manifest
+        return cast(Manifest, self.__manifest)
 
     # endregion
     # region Runners
@@ -88,16 +89,20 @@ class Switch:
         expr_func = get_step_func(step)
 
         # Eval Expression
-        label = next(case for case in self.cases if case is expr_func(data, context))
+        label = next((case for case in self.cases if case == expr_func(data, context)), self.default)
 
         # Execute Case
-        case = self.cases[label]
-        case_func = get_step_func(case)
-        case_manifest = ManifestManager.create(
-            get_step_name(case_func),
-            get_step_type(case_func)
-        )
-        data = case_func(data, context)
+        case = self.cases.get(label)
+        step_name = "Default"
+        step_type = StepType.UNDEFINED
+        if case:
+            case_func = get_step_func(case)
+            step_name = get_step_name(case_func)
+            step_type = get_step_type(case_func)
+
+        case_manifest = ManifestManager.create(step_name, step_type)
+
+        data = case_func(data, context) if case else data
 
         ManifestManager.close(case_manifest)
         manifest.steps.append(case_manifest)

@@ -22,7 +22,7 @@ class TestFilterEvents:
 
         f = MyFilter()
 
-        f.start.append(myfilter_start)
+        f.start += myfilter_start
 
         p = Pipeline(steps=[f])
         response = p.run(None)
@@ -50,3 +50,42 @@ class TestFilterEvents:
         response = p.run(None)
 
         assert response is None
+
+    @pytest.mark.happy
+    def test_event_handler_assignment(self):
+        class MyFilter(Filter):
+            def run(self, data, context) -> dict:
+                ...
+
+        def my_event_handler(sender: Filter, args: FilterEventArgs):
+            pass
+
+        my_filter = MyFilter()
+        my_filter.start += my_event_handler
+        my_filter.start.append(my_event_handler)
+        my_filter.start = my_filter.start + my_event_handler
+
+        my_filter.exit += my_event_handler
+        my_filter.exit.append(my_event_handler)
+        my_filter.exit = my_filter.start + my_event_handler
+
+        my_filter.end += my_event_handler
+        my_filter.end.append(my_event_handler)
+        my_filter.end = my_filter.start + my_event_handler
+
+        assert True
+
+    @pytest.mark.sad
+    def test_assigning_wrong_type_to_handlers(self):
+        class MyFilter(Filter):
+            def run(self, data, context) -> dict:
+                pass
+
+        with pytest.raises(TypeError):
+            MyFilter().start = []
+
+        with pytest.raises(TypeError):
+            MyFilter().exit = []
+
+        with pytest.raises(TypeError):
+            MyFilter().end = []

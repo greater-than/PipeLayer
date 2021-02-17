@@ -290,7 +290,7 @@ function Run_App {
         Execute_Command "python" $arguments
     }
     catch {
-        Write-Host "*** Run Application Tests Failed ***"
+        Write-Host "*** Run Application Failed ***"
         Write-Host "##vso[task.complete result=failed]"
         throw
     }

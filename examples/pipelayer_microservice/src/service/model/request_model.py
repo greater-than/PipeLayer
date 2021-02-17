@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class BaseRequest(BaseModel):
     api_name: str
+    http_headers: Optional[dict]
 
 
 class ListRequest(BaseRequest):

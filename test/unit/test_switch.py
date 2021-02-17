@@ -54,11 +54,9 @@ class TestSwitch:
     @pytest.mark.happy
     def test_switch_in_pipeline(self):
 
-        pipeline = Pipeline([
-            switch
-        ])
+        pipeline = Pipeline([switch])
 
-        data = pipeline.run(data=Car(), context=Context())
+        data = pipeline.run(Car(), context=Context())
         sm = switch.manifest
 
         assert sm

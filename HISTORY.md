@@ -1,5 +1,11 @@
 # PipeLayer: Version History
 
+## 0.6.0
+* Pipeline and Switch raise start/exit/end events
+* Filter pre_process/post_process methods removed in lieu of events to simplfy pipeline runner
+* Manifest models condensed
+
+
 ## 0.5.1
 * Enables addition assigment operator for appending event handlers
 * Adds `default` case for Switch filter

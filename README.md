@@ -7,7 +7,7 @@ PipeLayer is a lightweight Python pipeline framework. Define a series of steps, 
 * [Installation](#install)
 * [Getting Started](#get-started)
 * [The Framework](http://greaterthan.solutions/pipelayer/framework)<br>
-  Documentation has been moved to [greaterthan.solutions](http://greaterthan.solutions/pipelayer)
+  *Complete documentation can be found here: [greaterthan.solutions/pipelayer](http://greaterthan.solutions/pipelayer)*
 <br><br>
 
 
@@ -62,8 +62,8 @@ from hello_world_filters import HelloFilter, WorldFilter
 if __name__ = "__main__":
     hello_world_pipeline = Pipeline([
         HelloFilter,                           # pipeline.Filter type
-        WorldFilter,                           # pipeline.Filter instance
-        create_message_dict                    # function type
+        WorldFilter(),                         # pipeline.Filter instance
+        create_message_dict                    # function
         lambda data, context: json.dumps(data) # anonymous function
     ])
 

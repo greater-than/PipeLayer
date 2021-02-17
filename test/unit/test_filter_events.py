@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 import pytest
-from pipelayer import Action, Filter, FilterEventArgs, Pipeline
-from pipelayer.filter import raise_events
+from pipelayer import Action, Context, Filter, FilterEventArgs, Pipeline
+from pipelayer.filter import _parse_args, raise_events
+
+
+class MyFilter(Filter):
+    @raise_events
+    def run(self, data, context) -> dict:
+        return {"something": "goes here"}
 
 
 @pytest.mark.unit
@@ -10,12 +16,6 @@ class TestFilterEvents:
 
     @pytest.mark.happy
     def test_filter_on_start(self):
-
-        class MyFilter(Filter):
-
-            @raise_events
-            def run(self, data, context) -> dict:
-                return {"something": "goes here"}
 
         def myfilter_start(sender: object, args: FilterEventArgs) -> None:
             args.action = Action.EXIT
@@ -32,12 +32,6 @@ class TestFilterEvents:
     @pytest.mark.happy
     def test_filter_on_end(self):
 
-        class MyFilter(Filter):
-
-            @raise_events
-            def run(self, data, context) -> dict:
-                return {"something": "goes here"}
-
         def myfilter_end(sender: object, args: FilterEventArgs) -> None:
             args.data = None
             args.action = Action.EXIT
@@ -53,9 +47,6 @@ class TestFilterEvents:
 
     @pytest.mark.happy
     def test_event_handler_assignment(self):
-        class MyFilter(Filter):
-            def run(self, data, context) -> dict:
-                ...
 
         def my_event_handler(sender: Filter, args: FilterEventArgs):
             pass
@@ -89,3 +80,31 @@ class TestFilterEvents:
 
         with pytest.raises(TypeError):
             MyFilter().end = []
+
+    @pytest.mark.happy
+    def test_parse_args_2_args(self):
+
+        class MyFilter(Filter):
+            def run(self, data) -> dict:
+                pass
+
+        my_filter = MyFilter()
+        a, b, c = _parse_args(my_filter, "xyz")
+
+        assert a is my_filter
+        assert b == "xyz"
+        assert isinstance(c, Context)
+
+    @pytest.mark.happy
+    def test_parse_kwargs(self):
+
+        class MyFilter(Filter):
+            def run(self, data) -> dict:
+                pass
+
+        my_filter = MyFilter()
+        a, b, c = _parse_args(my_filter, data="xyz")
+
+        assert a is my_filter
+        assert b == "xyz"
+        assert isinstance(c, Context)

@@ -1,9 +1,9 @@
 import json
 
-from pipelayer.manifest import StepManifest
+from pipelayer.manifest import Manifest
 
 
-def render_manifest(manifest: StepManifest, indent: int = 2) -> str:
+def render_manifest(manifest: Manifest, indent: int = 2) -> str:
     """
     Renders a formatted Manifest
     """

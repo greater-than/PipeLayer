@@ -1,6 +1,6 @@
-. .\scripts\_lib.ps1
-
-Setup_Venv
+param(
+    [string] $pythonPath,
+    [string] $venvName
 )
 
 . .\scripts\_lib.ps1

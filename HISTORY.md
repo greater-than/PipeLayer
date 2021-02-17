@@ -3,7 +3,7 @@
 ## 0.5.1 - 2/20/21
 * Enables addition assigment operator for appending event handlers
 * Adds `default` case for Switch filter
-* Patches typing imports for Python 3.7
+* BUGFIX: Patches typing imports for Python 3.7
 
 
 ## 0.5.0 - 2/13/21

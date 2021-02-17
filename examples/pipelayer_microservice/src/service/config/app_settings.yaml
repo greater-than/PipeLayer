@@ -1,0 +1,6 @@
+dev:
+  user_service_api: https://reqres.in/api
+test:
+  user_service_api: https://reqres.in/api
+prod:
+  user_service_api: https://reqres.in/api

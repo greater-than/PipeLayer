@@ -1,9 +1,16 @@
+param(
+    [string] $pythonPath,
+    [string] $venvName
+)
+
 . .\scripts\_lib.ps1
 
-Write_Header "Build Package"
+if (-not($venvName)) { $venvName = ".venv" }
+
+Write_Header "Building..."
 Clean_Project
 
-Setup_Venv
+Setup_Venv $pythonPath $venvName
 Install_Requirements
 Install_Tools
 

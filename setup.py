@@ -46,10 +46,11 @@ setup_args = {
     "classifiers": [
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ],
-    "author": "greaterThan, LLC",
+    "author": "GreaterThan, LLC",
     "author_email": "info@greaterthan.solutions",
     "packages": find_packages("src"),
     "package_dir": {"": "src"},

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import (Any, Callable, List, Optional, Protocol, Tuple, TypeVar,
-                    runtime_checkable)
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
+from pipelayer._patch.typing import Protocol, runtime_checkable  # type: ignore
 from pipelayer.context import Context
 from pipelayer.event_args import FilterEventArgs
 

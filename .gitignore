@@ -20,5 +20,6 @@ dist
 .pytest_cache
 __pycache__
 *.py[co]
+.python-version
 
 FUTURE.md

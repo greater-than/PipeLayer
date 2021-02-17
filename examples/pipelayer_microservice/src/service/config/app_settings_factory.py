@@ -1,5 +1,6 @@
-from typing import Any, Optional, Protocol
+from typing import Any, Optional
 
+from pipelayer._patch.typing import Protocol
 from pydantic import BaseModel
 
 from service.config.app_settings_base import AppSettings

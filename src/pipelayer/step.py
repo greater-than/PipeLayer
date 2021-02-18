@@ -44,7 +44,7 @@ def initialize_step(
 
 
 def get_step(step: Union[IStep, PipelineCallableT]) -> Union[IStep, PipelineCallableT]:
-    if __is_step_type(step):
+    if is_step_type(step):
         return cast(type, step)()
     if not isinstance(step, IStep):
         step = cast(IStep, _StepProxy(step))
@@ -82,7 +82,7 @@ def get_step_type(step: Union[IStep, PipelineCallableT]) -> StepType:
     return StepType.FUNCTION
 
 
-def __is_step_type(step: Union[IStep, PipelineCallableT]) -> bool:
+def is_step_type(step: Union[IStep, PipelineCallableT]) -> bool:
     return inspect.isclass(step) and issubclass(cast(type, step), IStep)
 
 

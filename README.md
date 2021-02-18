@@ -1,9 +1,14 @@
 # PipeLayer
+
+[![LATEST](https://img.shields.io/github/v/release/greater-than/pipelayer?style=for-the-badge&logo=PyPi&logoColor=white)](https://pypi.org/project/pipelayer/)
+[![PyPI - License](https://img.shields.io/pypi/l/pipelayer?style=for-the-badge)](LICENSE)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pipelayer?style=for-the-badge&logo=Python&logoColor=white)
+[![GitHub top language](https://img.shields.io/github/languages/top/greater-than/pipelayer?style=for-the-badge)]()
+[![PyPI - Format](https://img.shields.io/pypi/format/pipelayer?style=for-the-badge)]()
+
+
 PipeLayer is a lightweight Python pipeline framework. Define a series of steps, and chain them together to create modular applications.
 <br>
-
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/greater-than/pipelayer)
-![PyPI - License](https://img.shields.io/pypi/l/pipelayer)
 
 ### Table of Contents
 

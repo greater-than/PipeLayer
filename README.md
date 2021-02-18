@@ -2,6 +2,9 @@
 PipeLayer is a lightweight Python pipeline framework. Define a series of steps, and chain them together to create modular applications.
 <br>
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/greater-than/pipelayer)
+![PyPI - License](https://img.shields.io/pypi/l/pipelayer)
+
 ### Table of Contents
 
 * [Installation](#install)

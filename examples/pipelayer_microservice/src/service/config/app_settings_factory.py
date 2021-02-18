@@ -1,15 +1,13 @@
-from typing import Any, Optional, Protocol
+from typing import Any, Optional
 
-from pydantic import BaseModel
-
-from service.config.app_settings_base import AppSettings
+from pipelayer._patch.typing import Protocol
+from service.config.app_settings import AppSettings
 
 
 class ISettingsProvider(Protocol):
-    def get() -> Any:
+    def get(*args) -> Any:
         pass
 
 
-class AppSettingsFactory:
-    def create(model: BaseModel, provider: Optional[ISettingsProvider] = None) -> AppSettings:
-        return model.parse_obj(provider.get()) if provider else model
+def create(provider: Optional[ISettingsProvider] = None) -> AppSettings:
+    return AppSettings.parse_obj(provider.get()) if provider else AppSettings()

@@ -1,7 +1,7 @@
 from logging import Logger
-from typing import Protocol
 
-from service.config.app_settings_base import AppSettings
+from pipelayer._patch.typing import Protocol
+from service.config.app_settings import AppSettings
 
 
 class IAppContext(Protocol):

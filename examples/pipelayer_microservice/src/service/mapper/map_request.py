@@ -1,6 +1,5 @@
 from pipelayer import Filter
 from pipelayer.filter import raise_events
-
 from service.config.app_context import AppContext
 from service.model.request_model import (UserListRequest, UserRequest,
                                          UserSearchRequest)

@@ -62,20 +62,20 @@ function Execute_Command {
 
 function Setup_Venv {
     param(
+        [string] $pythonPath,
         [string] $venvName
     )
 
     try {
         if (-not($venvName)) { $venvName = ".venv" }
+        if ($pythonPath) { $python = " --python=$pythonPath" }
 
-        if (-not (Get-Command "virtualenv")) {
-            Write_Banner "Installing virtualenv"
-            $arguments = "install virtualenv"
-            Execute_Command "pip" $arguments
-        }
+        Write_Banner "Installing virtualenv"
+        $arguments = "install virtualenv"
+        Execute_Command "pip" $arguments
 
         Write_Banner "Create Virtual Environment: $venvName"
-        $arguments = "-m virtualenv $venvName --pip=21.0.0 --download"
+        $arguments = "-m virtualenv $venvName --pip=21.0.0 --download $python"
         Execute_Command "python" $arguments
 
         Activate_Venv $venvName
@@ -290,7 +290,7 @@ function Run_App {
         Execute_Command "python" $arguments
     }
     catch {
-        Write-Host "*** Run Application Tests Failed ***"
+        Write-Host "*** Run Application Failed ***"
         Write-Host "##vso[task.complete result=failed]"
         throw
     }

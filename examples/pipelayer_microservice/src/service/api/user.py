@@ -1,12 +1,12 @@
 import json
 
 from pipelayer import Manifest
-
 from service.access_control import authorize
 from service.api import handle_exception
+from service.config import app_settings_factory
 from service.config.app_context import AppContext
-from service.config.app_settings import DevAppSettings
-from service.config.app_settings_factory import AppSettingsFactory
+from service.config.app_settings import AppSettings
+from service.config.app_settings_provider import AppSettingsProvider
 from service.model.domain_model import DomainModel
 from service.model.response_model import Response
 from service.pipeline.user_pipelines import (find_users_pipeline,
@@ -14,7 +14,7 @@ from service.pipeline.user_pipelines import (find_users_pipeline,
                                              get_users_pipeline)
 from service.provider.user.resreq import ResReqUserProvider
 
-settings = AppSettingsFactory.create(DevAppSettings)
+settings: AppSettings = app_settings_factory.create(AppSettingsProvider("dev"))
 context = AppContext(settings)
 user_provider = ResReqUserProvider
 

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import (Any, Callable, List, Optional, Protocol, Tuple,
-                    runtime_checkable)
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
+from pipelayer._patch.typing import Protocol, runtime_checkable  # type: ignore
 from pipelayer.context import Context
 from pipelayer.event_args import FilterEventArgs
 
@@ -100,3 +100,7 @@ class ICompoundStep(Protocol):  # pragma: no cover
 
     def _run(self, data: Any, context: Any) -> Tuple[Any, IManifest]:
         pass
+
+
+PipelineCallableT = TypeVar("PipelineCallableT", bound=Callable[[Any, Context], Any])
+FilterEventHandlerT = TypeVar("FilterEventHandlerT", bound=Callable[[IFilter, FilterEventArgs], None])

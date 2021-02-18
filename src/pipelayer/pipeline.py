@@ -1,26 +1,25 @@
 from __future__ import annotations
 
-from typing import Any, Callable, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, Iterable, Optional, Tuple, Union, cast
 
 from pipelayer.context import Context
 from pipelayer.enum import Action, StepType
 from pipelayer.event_args import FilterEventArgs
 from pipelayer.manifest import (FilterManifest, Manifest, ManifestManager,
                                 StepManifest)
-from pipelayer.protocol import IFilter, IStep
+from pipelayer.protocol import IFilter, IStep, PipelineCallableT
 from pipelayer.step import StepHelper
-from pipelayer.switch import Switch  # NOQA F401
 
 
 class Pipeline:
     # region Constructors
 
     def __init__(self: Pipeline,
-                 steps: List[Union[IStep, Callable[[Any, Context], Any]]],
+                 steps: Iterable[Union[IStep, PipelineCallableT]],
                  name: str = "") -> None:
-        self.__name = name or self.__class__.__name__
-        self.__steps: List[Union[IStep, Callable[[Any, Context], Any]]] = steps
-        self.__manifest: Manifest = None  # type: ignore
+        self.__name: str = name or self.__class__.__name__
+        self.__steps: Iterable[Union[IStep, PipelineCallableT]] = steps
+        self.__manifest: Optional[Manifest] = None
         self.__exit_pipeline: bool = False
 
     def __init_subclass__(cls, **kwargs: Any):
@@ -34,12 +33,12 @@ class Pipeline:
         return self.__name
 
     @property
-    def steps(self) -> List[Union[IStep, Callable[[Any, Context], Any]]]:
+    def steps(self) -> Iterable[Union[IStep, PipelineCallableT]]:
         return self.__steps
 
     @property
     def manifest(self) -> Manifest:
-        return self.__manifest
+        return cast(Manifest, self.__manifest)
 
     # endregion
     # region Runners
@@ -61,20 +60,20 @@ class Pipeline:
         initialize_step = StepHelper.initialize_step
         run_step_process = Pipeline.__run_step_process
 
-        for step, step_name, step_type, step_func, pre_process, post_process in map(initialize_step, self.steps):
-            step_manifest = create_manifest(step_name, step_type)
+        for s, s_name, s_type, s_func, pre_process, post_process in map(initialize_step, self.steps):  # type: ignore
+            step_manifest = create_manifest(s_name, s_type)
 
-            if step_type in (StepType.PIPELINE, StepType.SWITCH):
-                data, cast(Manifest, step_manifest).steps = step_func(data, context)
+            if s_type in (StepType.PIPELINE, StepType.SWITCH):
+                data, cast(Manifest, step_manifest).steps = s_func(data, context)
 
-            elif isinstance(step, IFilter):
+            elif isinstance(s, IFilter):
                 # step.pre_process
                 data, cast(FilterManifest, step_manifest).pre_process = \
                     run_step_process(pre_process, data, context)
 
                 # step
-                step.exit.append(self.__handle_exit)
-                data = step_func(data, context)
+                s.exit.append(self.__handle_exit)
+                data = s_func(data, context)
 
                 if self.__exit_pipeline:
                     close_manifest(step_manifest)
@@ -87,7 +86,7 @@ class Pipeline:
 
             else:
                 # step
-                data = step_func(data, context)
+                data = s_func(data, context)
 
             close_manifest(step_manifest)
             add_to_manifest(step_manifest)

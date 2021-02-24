@@ -47,7 +47,7 @@ class Filter(ABC):
     def name(self) -> str:
         return self.__name
 
-    # region Events
+    # region Event Handlers
 
     @property
     def start(self) -> EventHandlerList:
@@ -89,7 +89,7 @@ class Filter(ABC):
         raise NotImplementedError
 
     # endregion
-    # region Event Raisers
+    # region Events
 
     def _on_start(self, args: FilterEventArgs) -> None:
         [e(self, args) for e in self.start]

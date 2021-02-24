@@ -2,7 +2,36 @@ import pytest
 
 
 @pytest.mark.unit
-class TesPublishedExamples:
+class TestPublishedExamples:
+
+    @pytest.mark.happy
+    def test_getting_started(self):
+        # https://greaterthan.solutions/pipelayer/
+        import json
+
+        from pipelayer import Filter, Pipeline
+
+        class HelloFilter(Filter):
+            def run(self, data, context):
+                return "Hello"
+
+        class WorldFilter(Filter):
+            def run(self, data, context):
+                return f"{data}, World!"
+
+        def create_message_dict(data, context):
+            return {"message": data}
+
+        hello_world_pipeline = Pipeline([
+            HelloFilter,                            # pipeline.Filter type
+            WorldFilter(),                          # pipeline.Filter instance
+            create_message_dict,                    # function
+            lambda data, context: json.dumps(data)  # anonymous function
+        ])
+
+        output = hello_world_pipeline.run()
+
+        assert output == '{"message": "Hello, World!"}'
 
     @pytest.mark.happy
     def test_v5_events(self):

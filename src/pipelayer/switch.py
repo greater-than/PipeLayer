@@ -61,7 +61,7 @@ class Switch(Filter):
     # endregion
     # region Runners
 
-    def run(self, data: Any, context: Optional[Context] = None) -> Any:
+    def run(self, data: Any = None, context: Optional[Context] = None) -> Any:
         """[summary]
 
         Args:

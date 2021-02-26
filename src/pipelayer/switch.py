@@ -5,12 +5,14 @@ from uuid import uuid4
 
 from pipelayer.context import Context
 from pipelayer.enum import StepType
-from pipelayer.manifest import Manifest, ManifestManager
+from pipelayer.filter import Filter, raise_events
+from pipelayer.manifest import Manifest, close_manifest, create_manifest
 from pipelayer.protocol import IStep, PipelineCallableT
-from pipelayer.step import StepHelper
+from pipelayer.step import (get_step, get_step_func, get_step_name,
+                            get_step_type)
 
 
-class Switch:
+class Switch(Filter):
     """
     A Switch/Case filter. It implements the CompoundStep interface.
     """
@@ -22,16 +24,20 @@ class Switch:
                  name: Optional[str] = "") -> None:
         """
         Args:
-            expression (Union[Step, PipelineCallableT]): The switch expresssion:
+            expression (Union[Step, PipelineCallableT]):
             Can be a class that implements pipelayer.protocol.Step or a function/lambda that
             has the signature (data: Any, context; Context) -> Any.
-            cases (Dict[Any, Union[Step, PipelineCallableT]]): The list of labels and cases (Step)
-            name (Optional[str], optional): Used by the Manifest. Defaults to "".
+
+            cases (Dict[Any, Union[Step, PipelineCallableT]]):
+            The list of labels and cases (Step)
+
+            name (Optional[str], optional):
+            Used by the Manifest. Defaults to "".
         """
+        super().__init__(name or self.__class__.__name__)
         self.__expression = expression
         self.__cases = cases
         self.__manifest: Optional[Manifest] = None
-        self.__name = name or self.__class__.__name__
         self.default = uuid4().hex
 
     def __init_subclass__(cls, **kwargs: Any):
@@ -39,10 +45,6 @@ class Switch:
 
     # endregion
     # region Properties
-
-    @property
-    def name(self) -> str:
-        return self.__name
 
     @property
     def expression(self) -> Union[IStep, PipelineCallableT]:
@@ -59,7 +61,7 @@ class Switch:
     # endregion
     # region Runners
 
-    def run(self, data: Any, context: Optional[Context] = None) -> Any:
+    def run(self, data: Any = None, context: Optional[Context] = None) -> Any:
         """[summary]
 
         Args:
@@ -72,20 +74,13 @@ class Switch:
         data, self.__manifest = self._run(data, context or Context())
         return data
 
+    @raise_events
     def _run(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
 
-        get_step = StepHelper.get_step
-        get_step_name = StepHelper.get_step_name
-        get_step_type = StepHelper.get_step_type
-        get_step_func = StepHelper.get_step_func
-
-        manifest = cast(Manifest, ManifestManager.create(
-            StepHelper.get_step_name(self.expression),
-            StepType.SWITCH
-        ))
+        manifest = create_manifest(get_step_name(self.expression), StepType.SWITCH)
 
         # Expression
-        step = get_step(self.expression)
+        step = get_step(self.expression)  # type: ignore
         expr_func = get_step_func(step)
 
         # Eval Expression
@@ -93,21 +88,21 @@ class Switch:
 
         # Execute Case
         case = self.cases.get(label)
-        step_name = "Default"
-        step_type = StepType.UNDEFINED
+        case_name = "Default"
+        case_type = StepType.UNDEFINED
         if case:
             case_func = get_step_func(case)
-            step_name = get_step_name(case_func)
-            step_type = get_step_type(case_func)
+            case_name = get_step_name(case_func)
+            case_type = get_step_type(case_func)
 
-        case_manifest = ManifestManager.create(step_name, step_type)
+        case_manifest = create_manifest(case_name, case_type)
 
         data = case_func(data, context) if case else data
 
-        ManifestManager.close(case_manifest)
+        close_manifest(case_manifest)
         manifest.steps.append(case_manifest)
 
-        ManifestManager.close(manifest)
+        close_manifest(manifest)
         self.__manifest = manifest
 
         return data, manifest

@@ -38,7 +38,7 @@ def get_requirements() -> list:
 
 setup_args = {
     "name": "pipelayer",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "description": "A lightweight pipeline framework",
     "long_description": get_long_description(),
     "long_description_content_type": "text/markdown",
@@ -48,6 +48,7 @@ setup_args = {
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ],
     "author": "GreaterThan, LLC",

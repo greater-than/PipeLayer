@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, List, Optional, Tuple, TypeVar
+from typing import (Any, Callable, Iterable, List, Optional, Tuple, TypeVar,
+                    Union)
 
 from pipelayer._patch.typing import Protocol, runtime_checkable  # type: ignore
 from pipelayer.context import Context
@@ -20,26 +21,6 @@ class IManifest(Protocol):  # pragma: no cover
 
 
 @runtime_checkable
-class IStepManifest(Protocol):  # pragma: no cover
-    name: str
-    step_type: Enum
-    start: datetime
-    end: Optional[datetime]
-    duration: Optional[datetime]
-
-
-@runtime_checkable
-class IFilterManifest(Protocol):  # pragma: no cover
-    name: str
-    step_type: Enum
-    start: datetime
-    end: Optional[datetime]
-    duration: Optional[datetime]
-    pre_process: Optional[IStepManifest]
-    post_process: Optional[IStepManifest]
-
-
-@runtime_checkable
 class IStep(Protocol):  # pragma: no cover
     def run(self, data: Any, context: Optional[Context]) -> Any:
         pass
@@ -52,23 +33,27 @@ class IFilter(Protocol):  # pragma: no cover
         pass
 
     @property
-    def pre_process(self) -> Optional[Callable]:
+    def start(self) -> IEventHandlerList:
+        pass
+
+    @start.setter
+    def start(self, value: IEventHandlerList) -> None:
         pass
 
     @property
-    def post_process(self) -> Optional[Callable]:
+    def exit(self) -> IEventHandlerList:
+        pass
+
+    @exit.setter
+    def exit(self, value: IEventHandlerList) -> None:
         pass
 
     @property
-    def start(self) -> List[Callable[[IFilter, Any], Any]]:
+    def end(self) -> IEventHandlerList:
         pass
 
-    @property
-    def exit(self) -> List[Callable[[IFilter, Any], Any]]:
-        pass
-
-    @property
-    def end(self) -> List[Callable[[IFilter, Any], Any]]:
+    @end.setter
+    def end(self, value: IEventHandlerList) -> None:
         pass
 
     def run(self, data: Any, context: Any) -> Any:
@@ -104,3 +89,15 @@ class ICompoundStep(Protocol):  # pragma: no cover
 
 PipelineCallableT = TypeVar("PipelineCallableT", bound=Callable[[Any, Context], Any])
 FilterEventHandlerT = TypeVar("FilterEventHandlerT", bound=Callable[[IFilter, FilterEventArgs], None])
+
+
+class IEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cover
+
+    def append(self, handler: FilterEventHandlerT) -> None:
+        pass
+
+    def __iadd__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> IEventHandlerList:
+        pass
+
+    def __add__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> IEventHandlerList:
+        pass

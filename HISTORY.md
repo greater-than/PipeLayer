@@ -1,10 +1,14 @@
 # PipeLayer: Version History
 
-## 0.5.1 - 2/20/21
+## 0.6.0 - 2/26/21
+* Pipeline and Switch raise start/exit/end events
+* Removes Filter pre_process/post_process methods in lieu of events to simplfy pipeline runner
+* Condenses Manifest models
+
+## 0.5.1 - 2/18/21
 * Enables addition assigment operator for appending event handlers
 * Adds `default` case for Switch filter
 * BUGFIX: Patches typing imports for Python 3.7
-
 
 ## 0.5.0 - 2/13/21
 * Adds start/exit/filter events to `pipelayer.Filter`

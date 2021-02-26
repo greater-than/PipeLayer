@@ -12,27 +12,21 @@ manifest_dict = {
             "step_type": StepType.FILTER,
             "start": 1611261880.498892,
             "end": 1611261880.498892,
-            "duration": "P0DT0H0M0.000000S",
-            "pre_process": None,
-            "post_process": None
+            "duration": "P0DT0H0M0.000000S"
         },
         {
             "name": "second_filter",
             "step_type": StepType.FILTER,
             "start": 1611261880.498892,
             "end": 1611261880.498892,
-            "duration": "P0DT0H0M0.000000S",
-            "pre_process": None,
-            "post_process": None
+            "duration": "P0DT0H0M0.000000S"
         },
         {
             "name": "[lambda data, context: json.dumps(data)]",
             "step_type": StepType.FILTER,
             "start": 1611261880.498892,
             "end": 1611261880.49989,
-            "duration": "P0DT0H0M0.000998S",
-            "pre_process": None,
-            "post_process": None
+            "duration": "P0DT0H0M0.000998S"
         }
     ]
 }

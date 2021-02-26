@@ -50,7 +50,7 @@ class WorldFilter(Filter):
 
 `functions.py`
 ```python
-def create_message_dict(data, context):
+def create_message(data, context):
     return {"message": data}
 ```
 
@@ -60,27 +60,31 @@ Create a module to run the pipeline:
 `app.py`
 ```python
 import json
-
 from pipelayer import Pipeline
+from pipelayer.util import render_manifest
 
 from functions import create_message
 from hello_world_filters import HelloFilter, WorldFilter
 
 
-if __name__ = "__main__":
-    hello_world_pipeline = Pipeline([
-        HelloFilter,                            # Filter type
-        WorldFilter(),                          # Filter instance
-        create_message_dict,                    # function
-        lambda data, context: json.dumps(data)  # anonymous function
-    ])
+if __name__ == "__main__":
+    hello_world_pipeline = Pipeline(
+        [
+            HelloFilter,
+            WorldFilter,
+            create_message,
+            lambda data, context: json.dumps(data),
+        ]
+    )
 
-    output = hello_world_pipeline.run()
+    output = hello_world_pipeline.run(None)
 
     # output = '{"message": "Hello, World!"}'
 
-    print(f"Pipeline Output: {output}")
-    print(hello_world_pipeline.manifest.__dict__)
+    print("\nPipeline Output:")
+    print(output)
+    print("\nManifest:")
+    print(render_manifest(hello_world_pipeline.manifest))
 
 ```
 

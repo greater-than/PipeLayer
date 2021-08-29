@@ -5,6 +5,28 @@ import pytest
 class TestPublishedExamples:
 
     @pytest.mark.happy
+    def test_events_all_the_way_down(self):
+        # https://greaterthan.solutions/2021/03/pipelayer-0-6-0/
+        from typing import Any
+
+        from pipelayer import Context, Filter, FilterEventArgs, Pipeline
+
+        class MyStep(Filter):
+            def run(self, data: Any = None, context: Context = None):
+                return None
+
+        def my_pipeline_start(o: Pipeline, e: FilterEventArgs):
+            # do nothing here
+            pass
+
+        my_pipeline = Pipeline([MyStep])
+        my_pipeline.start += my_pipeline_start
+
+        output = my_pipeline.run()
+
+        assert output is None
+
+    @pytest.mark.happy
     def test_getting_started(self):
         # https://greaterthan.solutions/pipelayer/
         import json

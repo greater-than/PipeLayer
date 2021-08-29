@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 from pipelayer import Action, Context, Filter, FilterEventArgs, Pipeline
-from pipelayer.filter import _parse_args, raise_events
+from pipelayer.filter import _parse_filter_event_args, raise_events
 
 
 class MyFilter(Filter):
@@ -89,7 +89,7 @@ class TestFilterEvents:
                 pass
 
         my_filter = MyFilter()
-        a, b, c = _parse_args(my_filter, "xyz")
+        a, b, c = _parse_filter_event_args(my_filter, "xyz")
 
         assert a is my_filter
         assert b == "xyz"
@@ -103,7 +103,7 @@ class TestFilterEvents:
                 pass
 
         my_filter = MyFilter()
-        a, b, c = _parse_args(my_filter, data="xyz")
+        a, b, c = _parse_filter_event_args(my_filter, data="xyz")
 
         assert a is my_filter
         assert b == "xyz"

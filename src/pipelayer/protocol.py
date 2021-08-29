@@ -5,9 +5,10 @@ from enum import Enum
 from typing import (Any, Callable, Iterable, List, Optional, Tuple, TypeVar,
                     Union)
 
+from event_decorators import raise_filter_events as raise_events  # NOQA F401
 from pipelayer._patch.typing import Protocol, runtime_checkable  # type: ignore
 from pipelayer.context import Context
-from pipelayer.event_args import FilterEventArgs
+from pipelayer.event_args import FilterEventArgs, PipelineEventArgs
 
 
 @runtime_checkable
@@ -27,33 +28,58 @@ class IStep(Protocol):  # pragma: no cover
 
 
 @runtime_checkable
+class IPipeline(Protocol):  # pragma: no cover
+    @property
+    def step_start(self) -> IPipelineEventHandlerList:
+        pass
+
+    @step_start.setter
+    def step_start(self, value: IPipelineEventHandlerList) -> None:
+        pass
+
+    @property
+    def step_end(self) -> IPipelineEventHandlerList:
+        pass
+
+    @step_end.setter
+    def step_end(self, value: IPipelineEventHandlerList) -> None:
+        pass
+
+    def _on_step_start(self, args: PipelineEventArgs) -> None:
+        pass
+
+    def _on_step_end(self, args: PipelineEventArgs) -> None:
+        pass
+
+
+@runtime_checkable
 class IFilter(Protocol):  # pragma: no cover
     @property
     def name(self) -> str:
         pass
 
     @property
-    def start(self) -> IEventHandlerList:
+    def start(self) -> IFilterEventHandlerList:
         pass
 
     @start.setter
-    def start(self, value: IEventHandlerList) -> None:
+    def start(self, value: IFilterEventHandlerList) -> None:
         pass
 
     @property
-    def exit(self) -> IEventHandlerList:
+    def exit(self) -> IFilterEventHandlerList:
         pass
 
     @exit.setter
-    def exit(self, value: IEventHandlerList) -> None:
+    def exit(self, value: IFilterEventHandlerList) -> None:
         pass
 
     @property
-    def end(self) -> IEventHandlerList:
+    def end(self) -> IFilterEventHandlerList:
         pass
 
     @end.setter
-    def end(self, value: IEventHandlerList) -> None:
+    def end(self, value: IFilterEventHandlerList) -> None:
         pass
 
     def run(self, data: Any, context: Any) -> Any:
@@ -89,15 +115,52 @@ class ICompoundStep(Protocol):  # pragma: no cover
 
 PipelineCallableT = TypeVar("PipelineCallableT", bound=Callable[[Any, Context], Any])
 FilterEventHandlerT = TypeVar("FilterEventHandlerT", bound=Callable[[IFilter, FilterEventArgs], None])
+PipelineEventHandlerT = TypeVar("PipelineEventHandlerT", bound=Callable[[IPipeline, PipelineEventArgs], None])
 
 
-class IEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cover
+class IFilterEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cover
 
     def append(self, handler: FilterEventHandlerT) -> None:
         pass
 
-    def __iadd__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> IEventHandlerList:
+    def __iadd__(
+        self,
+        handlers: Union[
+            FilterEventHandlerT,
+            Iterable[FilterEventHandlerT]
+        ]
+    ) -> IFilterEventHandlerList:
         pass
 
-    def __add__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> IEventHandlerList:
+    def __add__(
+        self,
+        handlers: Union[
+            FilterEventHandlerT,
+            Iterable[FilterEventHandlerT]
+        ]
+    ) -> IFilterEventHandlerList:
+        pass
+
+
+class IPipelineEventHandlerList(Iterable[PipelineEventHandlerT]):  # pragma: no cover
+
+    def append(self, handler: PipelineEventHandlerT) -> None:
+        pass
+
+    def __iadd__(
+        self,
+        handlers: Union[
+            PipelineEventHandlerT,
+            Iterable[PipelineEventHandlerT]
+        ]
+    ) -> IPipelineEventHandlerList:
+        pass
+
+    def __add__(
+        self,
+        handlers: Union[
+            PipelineEventHandlerT,
+            Iterable[PipelineEventHandlerT]
+        ]
+    ) -> IPipelineEventHandlerList:
         pass

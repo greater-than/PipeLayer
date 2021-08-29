@@ -1,14 +1,38 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, Optional, Tuple, Union, cast
+from typing import Any, Iterable, List, Optional, Tuple, Union, cast
 
 from pipelayer.context import Context
 from pipelayer.enum import Action, StepType
-from pipelayer.event_args import FilterEventArgs
-from pipelayer.filter import Filter, raise_events
+from pipelayer.event_args import FilterEventArgs, PipelineEventArgs
+from pipelayer.event_decorators import (raise_filter_events,
+                                        raise_pipeline_events)
+from pipelayer.filter import Filter
 from pipelayer.manifest import Manifest, close_manifest, create_manifest
-from pipelayer.protocol import ICompoundStep, IFilter, IStep, PipelineCallableT
+from pipelayer.protocol import (ICompoundStep, IFilter, IStep,
+                                PipelineCallableT, PipelineEventHandlerT)
 from pipelayer.step import initialize_step
+
+
+class PipelineEventHandlerList(List[PipelineEventHandlerT]):
+    def append(self, handler: PipelineEventHandlerT) -> None:
+        super().append(handler)
+
+    def __iadd__(
+        self,
+        handlers: Union[PipelineEventHandlerT, Iterable[PipelineEventHandlerT]]
+    ) -> PipelineEventHandlerList:
+        return PipelineEventHandlerList(super().__iadd__(handlers if isinstance(handlers, Iterable) else [handlers]))
+
+    def __add__(
+        self,
+        handlers: Union[PipelineEventHandlerT, Iterable[PipelineEventHandlerT]]
+    ) -> PipelineEventHandlerList:
+        return PipelineEventHandlerList(super().__add__(
+            PipelineEventHandlerList(handlers)
+            if isinstance(handlers, Iterable)
+            else PipelineEventHandlerList([handlers])
+        ))
 
 
 class Pipeline(Filter):
@@ -21,6 +45,8 @@ class Pipeline(Filter):
         self.__steps: Iterable[Union[IStep, PipelineCallableT]] = steps
         self.__manifest: Optional[Manifest] = None
         self.__exit_pipeline: bool = False
+        self.__step_start: PipelineEventHandlerList = PipelineEventHandlerList()
+        self.__step_end: PipelineEventHandlerList = PipelineEventHandlerList()
         self.exit += self._handle_exit
 
     def __init_subclass__(cls, **kwargs: Any):
@@ -37,6 +63,18 @@ class Pipeline(Filter):
     def manifest(self) -> Manifest:
         return cast(Manifest, self.__manifest)
 
+    # region Event Handlers
+
+    @property
+    def step_start(self) -> PipelineEventHandlerList:
+        return self.__step_start
+
+    @property
+    def step_end(self) -> PipelineEventHandlerList:
+        return self.__step_end
+
+    # endregion
+
     # endregion
     # region Runners
 
@@ -47,7 +85,8 @@ class Pipeline(Filter):
         data, self.__manifest = self._run(data, context or Context())
         return data
 
-    @raise_events
+    @raise_pipeline_events
+    @raise_filter_events
     def _run(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
 
         manifest = create_manifest(self.name, StepType.PIPELINE)
@@ -81,6 +120,16 @@ class Pipeline(Filter):
         return data, manifest
 
     # endregion
+    # region Events
+
+    def _on_step_start(self, args: PipelineEventArgs) -> None:
+        [e(self, args) for e in self.step_start]
+
+    def _on_step_end(self, args: PipelineEventArgs) -> None:
+        [e(self, args) for e in self.step_end]
+
+    # endregion
+
     # region Event Handlers
 
     def _handle_exit(self, sender: IFilter, args: FilterEventArgs) -> None:

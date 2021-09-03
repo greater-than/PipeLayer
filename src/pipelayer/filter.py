@@ -11,18 +11,18 @@ from pipelayer.event_args import FilterEventArgs
 from pipelayer.protocol import FilterEventHandlerT, IFilter
 
 
-class EventHandlerList(List[FilterEventHandlerT]):
+class FilterEventHandlerList(List[FilterEventHandlerT]):
     def append(self, handler: FilterEventHandlerT) -> None:
         super().append(handler)
 
-    def __iadd__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> EventHandlerList:
-        return EventHandlerList(super().__iadd__(handlers if isinstance(handlers, Iterable) else [handlers]))
+    def __iadd__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> FilterEventHandlerList:
+        return FilterEventHandlerList(super().__iadd__(handlers if isinstance(handlers, Iterable) else [handlers]))
 
-    def __add__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> EventHandlerList:
-        return EventHandlerList(super().__add__(
-            EventHandlerList(handlers)
+    def __add__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> FilterEventHandlerList:
+        return FilterEventHandlerList(super().__add__(
+            FilterEventHandlerList(handlers)
             if isinstance(handlers, Iterable)
-            else EventHandlerList([handlers])
+            else FilterEventHandlerList([handlers])
         ))
 
 
@@ -37,9 +37,9 @@ class Filter(ABC):
     ) -> None:
         self.__name = name or self.__class__.__name__
 
-        self.__start: EventHandlerList = EventHandlerList()
-        self.__exit: EventHandlerList = EventHandlerList()
-        self.__end: EventHandlerList = EventHandlerList()
+        self.__start: FilterEventHandlerList = FilterEventHandlerList()
+        self.__exit: FilterEventHandlerList = FilterEventHandlerList()
+        self.__end: FilterEventHandlerList = FilterEventHandlerList()
 
     # region Properties
 
@@ -50,32 +50,32 @@ class Filter(ABC):
     # region Event Handlers
 
     @property
-    def start(self) -> EventHandlerList:
+    def start(self) -> FilterEventHandlerList:
         return self.__start
 
     @start.setter
-    def start(self, value: EventHandlerList) -> None:
-        if not isinstance(value, EventHandlerList):
+    def start(self, value: FilterEventHandlerList) -> None:
+        if not isinstance(value, FilterEventHandlerList):
             raise TypeError("Value must be an instance of EventHandlerList")
         self.__start = value
 
     @property
-    def exit(self) -> EventHandlerList:
+    def exit(self) -> FilterEventHandlerList:
         return self.__exit
 
     @exit.setter
-    def exit(self, value: EventHandlerList) -> None:
-        if not isinstance(value, EventHandlerList):
+    def exit(self, value: FilterEventHandlerList) -> None:
+        if not isinstance(value, FilterEventHandlerList):
             raise TypeError("Value must be an instance of EventHandlerList")
         self.__exit = value
 
     @property
-    def end(self) -> EventHandlerList:
+    def end(self) -> FilterEventHandlerList:
         return self.__end
 
     @end.setter
-    def end(self, value: EventHandlerList) -> None:
-        if not isinstance(value, EventHandlerList):
+    def end(self, value: FilterEventHandlerList) -> None:
+        if not isinstance(value, FilterEventHandlerList):
             raise TypeError("Value must be an instance of EventHandlerList")
         self.__end = value
 
@@ -103,7 +103,7 @@ class Filter(ABC):
     # endregion
 
 
-def _parse_args(*args: str, **kwargs: dict) -> Tuple[IFilter, Any, Context]:
+def _parse_filter_event_args(*args: str, **kwargs: dict) -> Tuple[IFilter, Any, Context]:
 
     if len(args) == 3:
         return cast(IFilter, args[0]), args[1], cast(Context, args[2])
@@ -134,7 +134,7 @@ def raise_events(func: Callable) -> Callable:
     """
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Callable:
-        filter, data, context = _parse_args(*args, **kwargs)
+        filter, data, context = _parse_filter_event_args(*args, **kwargs)
 
         evt_args = FilterEventArgs(data, context, State.RUNNING)
 

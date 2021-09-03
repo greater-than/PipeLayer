@@ -14,7 +14,7 @@ from pipelayer.step import (get_step, get_step_func, get_step_name,
 
 class Switch(Filter):
     """
-    A Switch/Case filter. It implements the CompoundStep interface.
+    A Switch/Case filter. It implements the IFilter and ICompoundStep interface.
     """
     # region Constructors
 

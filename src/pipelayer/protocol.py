@@ -5,7 +5,6 @@ from enum import Enum
 from typing import (Any, Callable, Iterable, List, Optional, Tuple, TypeVar,
                     Union)
 
-from event_decorators import raise_filter_events as raise_events  # NOQA F401
 from pipelayer._patch.typing import Protocol, runtime_checkable  # type: ignore
 from pipelayer.context import Context
 from pipelayer.event_args import FilterEventArgs, PipelineEventArgs

@@ -5,9 +5,7 @@ from typing import Any, Iterable, List, Optional, Tuple, Union, cast
 from pipelayer.context import Context
 from pipelayer.enum import Action, StepType
 from pipelayer.event_args import FilterEventArgs, PipelineEventArgs
-from pipelayer.event_decorators import (raise_filter_events,
-                                        raise_pipeline_events)
-from pipelayer.filter import Filter
+from pipelayer.filter import Filter, raise_events
 from pipelayer.manifest import Manifest, close_manifest, create_manifest
 from pipelayer.protocol import (ICompoundStep, IFilter, IStep,
                                 PipelineCallableT, PipelineEventHandlerT)
@@ -45,7 +43,6 @@ class Pipeline(Filter):
         self.__steps: Iterable[Union[IStep, PipelineCallableT]] = steps
         self.__manifest: Optional[Manifest] = None
         self.__exit_pipeline: bool = False
-        self.__step_start: PipelineEventHandlerList = PipelineEventHandlerList()
         self.__step_end: PipelineEventHandlerList = PipelineEventHandlerList()
         self.exit += self._handle_exit
 
@@ -66,12 +63,14 @@ class Pipeline(Filter):
     # region Event Handlers
 
     @property
-    def step_start(self) -> PipelineEventHandlerList:
-        return self.__step_start
-
-    @property
     def step_end(self) -> PipelineEventHandlerList:
         return self.__step_end
+
+    @step_end.setter
+    def step_end(self, value: PipelineEventHandlerList) -> None:
+        if not isinstance(value, PipelineEventHandlerList):
+            raise TypeError("Value must be an instance of FilterEventHandlerList")
+        self.__step_end = value
 
     # endregion
 
@@ -85,8 +84,7 @@ class Pipeline(Filter):
         data, self.__manifest = self._run(data, context or Context())
         return data
 
-    @raise_pipeline_events
-    @raise_filter_events
+    @raise_events
     def _run(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
 
         manifest = create_manifest(self.name, StepType.PIPELINE)
@@ -106,6 +104,7 @@ class Pipeline(Filter):
 
                 if self.__exit_pipeline:
                     close_manifest(s_manifest)
+                    self._on_step_end(PipelineEventArgs(data, s_manifest))
                     manifest.steps.append(s_manifest)
                     break
 
@@ -113,6 +112,7 @@ class Pipeline(Filter):
                 data = s_func(data, context)
 
             close_manifest(s_manifest)
+            self._on_step_end(PipelineEventArgs(data, s_manifest))
             manifest.steps.append(s_manifest)
 
         close_manifest(manifest)
@@ -120,10 +120,7 @@ class Pipeline(Filter):
         return data, manifest
 
     # endregion
-    # region Events
-
-    def _on_step_start(self, args: PipelineEventArgs) -> None:
-        [e(self, args) for e in self.step_start]
+    # region
 
     def _on_step_end(self, args: PipelineEventArgs) -> None:
         [e(self, args) for e in self.step_end]

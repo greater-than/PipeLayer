@@ -1,10 +1,7 @@
 # PipeLayer: Version History
 
 ## 0.7.0 - 9/3/2021
-* Adds pipline events `step_start` and `step_end`
-
-BREAKING CHANGES:
-* raise_events renamed to `raise_filter_events`
+* Adds pipline event `step_end`
 
 ## 0.6.0 - 2/26/21
 * Pipeline and Switch raise start/exit/end events

@@ -5,8 +5,7 @@ from uuid import uuid4
 
 from pipelayer.context import Context
 from pipelayer.enum import StepType
-from pipelayer.event_decorators import raise_filter_events
-from pipelayer.filter import Filter
+from pipelayer.filter import Filter, raise_events
 from pipelayer.manifest import Manifest, close_manifest, create_manifest
 from pipelayer.protocol import IStep, PipelineCallableT
 from pipelayer.step import (get_step, get_step_func, get_step_name,
@@ -75,7 +74,7 @@ class Switch(Filter):
         data, self.__manifest = self._run(data, context or Context())
         return data
 
-    @raise_filter_events
+    @raise_events
     def _run(self, data: Any, context: Context) -> Tuple[Any, Manifest]:
 
         manifest = create_manifest(get_step_name(self.expression), StepType.SWITCH)

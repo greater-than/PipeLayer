@@ -1,6 +1,5 @@
 import pytest
-from pipelayer import Pipeline
-from pipelayer.event_args import PipelineEventArgs
+from pipelayer import Pipeline, PipelineEventArgs
 from pipelayer.filter import Filter
 
 

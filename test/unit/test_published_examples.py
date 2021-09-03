@@ -5,6 +5,34 @@ import pytest
 class TestPublishedExamples:
 
     @pytest.mark.happy
+    def test_pipelayer_0_7_0(self):
+        import logging
+
+        from pipelayer import Filter, Pipeline, PipelineEventArgs
+
+        logger = logging.getLogger()
+
+        class MyFilter(Filter):
+            def run(self, data, context):
+                return f"{data} has been modified"
+
+        # Handles the filter start event
+        def my_pipeline_step_end(obj: Filter, args: PipelineEventArgs):
+            logger.info(args.manifest_entry)
+
+        my_filter = MyFilter()
+
+        my_pipeline = Pipeline(steps=[
+            my_filter
+        ])
+
+        my_pipeline.step_end += my_pipeline_step_end
+
+        output = my_pipeline.run("Data", None)
+
+        assert output == "Data has been modified"
+
+    @pytest.mark.happy
     def test_events_all_the_way_down(self):
         # https://greaterthan.solutions/2021/03/pipelayer-0-6-0/
         from typing import Any

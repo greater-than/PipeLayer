@@ -13,10 +13,12 @@ class TestEventArgs:
         from pipelayer.manifest import Manifest
 
         evt_args: PipelineEventArgs = PipelineEventArgs(
+            "step_name",
             "test",
             Manifest(name="test", step_type=StepType.FILTER, start=datetime.datetime.now())
         )
 
+        assert evt_args.step_name == "step_name"
         assert evt_args.data == "test"
         assert isinstance(evt_args.manifest_entry, Manifest)
 
@@ -27,12 +29,14 @@ class TestEventArgs:
         from pipelayer.manifest import Manifest
 
         evt_args: PipelineEventArgs = PipelineEventArgs(
+            "step_name",
             "test",
             Manifest(name="test", step_type=StepType.FILTER, start=datetime.datetime.now())
         )
 
         evt_args.data = "test"
 
+        assert evt_args.step_name == "step_name"
         assert evt_args.data == "test"
         assert isinstance(evt_args.manifest_entry, Manifest)
 

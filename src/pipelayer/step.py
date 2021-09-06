@@ -6,7 +6,7 @@ from typing import Any, Callable, Tuple, Union, cast
 from pipelayer.context import Context
 from pipelayer.enum import StepType
 from pipelayer.exception import InvalidFilterException
-from pipelayer.protocol import ICompoundStep, IStep, PipelineCallableT
+from pipelayer.protocol import ICompoundStep, IFilter, IStep, PipelineCallableT
 
 
 class _StepProxy:
@@ -109,6 +109,10 @@ def is_proxy(obj: Any) -> bool:
 
 def is_step(obj: Any) -> bool:
     return isinstance(obj, IStep)
+
+
+def is_filter(obj: Any) -> bool:
+    return isinstance(obj, IFilter)
 
 
 def is_compound_step(obj: Any) -> bool:

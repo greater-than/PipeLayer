@@ -29,14 +29,6 @@ class IStep(Protocol):  # pragma: no cover
 @runtime_checkable
 class IPipeline(Protocol):  # pragma: no cover
     @property
-    def step_start(self) -> IPipelineEventHandlerList:
-        pass
-
-    @step_start.setter
-    def step_start(self, value: IPipelineEventHandlerList) -> None:
-        pass
-
-    @property
     def step_end(self) -> IPipelineEventHandlerList:
         pass
 
@@ -45,9 +37,6 @@ class IPipeline(Protocol):  # pragma: no cover
         pass
 
     def _on_step_start(self, args: PipelineEventArgs) -> None:
-        pass
-
-    def _on_step_end(self, args: PipelineEventArgs) -> None:
         pass
 
 

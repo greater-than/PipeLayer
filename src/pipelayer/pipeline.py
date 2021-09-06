@@ -7,9 +7,9 @@ from pipelayer.enum import Action, StepType
 from pipelayer.event_args import FilterEventArgs, PipelineEventArgs
 from pipelayer.filter import Filter, raise_events
 from pipelayer.manifest import Manifest, close_manifest, create_manifest
-from pipelayer.protocol import (ICompoundStep, IFilter, IStep,
-                                PipelineCallableT, PipelineEventHandlerT)
-from pipelayer.step import initialize_step
+from pipelayer.protocol import (IFilter, IStep, PipelineCallableT,
+                                PipelineEventHandlerT)
+from pipelayer.step import initialize_step, is_compound_step, is_filter
 
 
 class PipelineEventHandlerList(List[PipelineEventHandlerT]):
@@ -93,10 +93,10 @@ class Pipeline(Filter):
 
             s_manifest = create_manifest(s_name, s_type)
 
-            if isinstance(s, IFilter):
-                s.exit += self._handle_exit
+            if is_filter(s):
+                cast(IFilter, s).exit += self._handle_exit
 
-                if isinstance(s, ICompoundStep):
+                if is_compound_step(s):
                     data, m_fest = s_func(data, context)
                     s_manifest.steps = cast(Manifest, m_fest).steps
                 else:
@@ -104,7 +104,7 @@ class Pipeline(Filter):
 
                 if self.__exit_pipeline:
                     close_manifest(s_manifest)
-                    self._on_step_end(PipelineEventArgs(data, s_manifest))
+                    self._on_step_end(PipelineEventArgs(s_name, data, s_manifest))
                     manifest.steps.append(s_manifest)
                     break
 
@@ -112,7 +112,7 @@ class Pipeline(Filter):
                 data = s_func(data, context)
 
             close_manifest(s_manifest)
-            self._on_step_end(PipelineEventArgs(data, s_manifest))
+            self._on_step_end(PipelineEventArgs(s_name, data, s_manifest))
             manifest.steps.append(s_manifest)
 
         close_manifest(manifest)
@@ -120,7 +120,7 @@ class Pipeline(Filter):
         return data, manifest
 
     # endregion
-    # region
+    # region Events
 
     def _on_step_end(self, args: PipelineEventArgs) -> None:
         [e(self, args) for e in self.step_end]

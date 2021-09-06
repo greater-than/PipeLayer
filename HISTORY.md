@@ -1,5 +1,8 @@
 # PipeLayer: Version History
 
+## 0.7.1 - 9/3/2021
+* Adds `step_name` to PipelineEventArgs
+
 ## 0.7.0 - 9/3/2021
 * Adds pipline event `step_end`
 

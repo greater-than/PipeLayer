@@ -43,8 +43,14 @@
         "python.testing.nosetestsEnabled": false,
         "python.testing.pytestEnabled": true,
         "cSpell.words": [
+            "autopep",
             "greaterthan",
-            "pipelayer"
+            "nosetests",
+            "pipelayer",
+            "pydantic",
+            "pytest",
+            "stringbender",
+            "venv"
         ]
     }
 }

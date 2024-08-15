@@ -5,7 +5,7 @@
         }
     ],
     "settings": {
-        "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
+        "python.defaultInterpreterPath": ".venv/bin/python",
         "python.analysis.extraPaths": [
             "./src",
             "./test",
@@ -41,6 +41,10 @@
         ],
         "python.testing.unittestEnabled": false,
         "python.testing.nosetestsEnabled": false,
-        "python.testing.pytestEnabled": true
+        "python.testing.pytestEnabled": true,
+        "cSpell.words": [
+            "greaterthan",
+            "pipelayer"
+        ]
     }
 }

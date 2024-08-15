@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Callable, Optional
 
 from pipelayer.enum import StepType
@@ -33,9 +33,9 @@ def create_manifest(name: str, step_type: StepType) -> Manifest:
     return Manifest(
         name=name,
         step_type=step_type,
-        start=datetime.utcnow())
+        start=datetime.now(UTC))
 
 
 def close_manifest(manifest: Manifest) -> None:
-    manifest.end = datetime.utcnow()
+    manifest.end = datetime.now(UTC)
     manifest.duration = manifest.end - manifest.start

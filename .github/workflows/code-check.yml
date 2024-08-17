@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: |
           pipx install poetry
-          poetry install --with dev, test
           poetry use ${{ matrix.python-version }}
+          poetry install --with dev, test
           # python -m pip install --upgrade pip
           # pip install flake8 pytest
           # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi

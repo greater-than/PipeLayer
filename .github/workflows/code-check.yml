@@ -32,9 +32,9 @@ jobs:
         run: |
           pipx install poetry
           poetry env use ${{ matrix.python-version }}
-          source .venv/bin/activate
           poetry lock [--no-update]
           poetry install
+          source .venv/bin/activate
           # python -m pip install --upgrade pip
           # pip install flake8 pytest
           # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi

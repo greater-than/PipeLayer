@@ -17,10 +17,11 @@ jobs:
         python-version: [3.7, 3.8, 3.9, 3.10, 3.11, 3.12]
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4.1.7
 
       - name: Setup Python ${{ matrix.python-version }}
+        id: setup-python
         uses: actions/setup-python@v5.1.1
         with:
           python-version: ${{ matrix.python-version }}
@@ -33,6 +34,17 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-path: ~/.venv
           installer-parallel: true
+
+      - name: Load Cached Virtual Environment
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
       - name: Install dependencies
         run: |

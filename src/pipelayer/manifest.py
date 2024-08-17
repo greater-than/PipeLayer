@@ -1,8 +1,8 @@
-import datetime as d
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional
 
 from pipelayer.enum import StepType
+from pipelayer.utils.datetime_utils import get_now_utc
 from pydantic import BaseModel, dataclasses
 from pydantic.json import timedelta_isoformat
 from stringbender import camel
@@ -39,9 +39,9 @@ def create_manifest(name: str, step_type: StepType) -> Manifest:
     return Manifest(
         name=name,
         step_type=step_type,
-        start=datetime.now(d.UTC))  # type: ignore
+        start=get_now_utc())
 
 
 def close_manifest(manifest: Manifest) -> None:
-    manifest.end = datetime.now(d.UTC)  # type: ignore
+    manifest.end = get_now_utc()
     manifest.duration = manifest.end - manifest.start

@@ -6,7 +6,7 @@ class TestUtil:
 
     @pytest.mark.happy
     def test_render_manifest(self, manifest: dict):
-        from pipelayer.util import render_manifest
+        from pipelayer.utils.manifest_utils import render_manifest
 
         should_be = (
             '{\n  "name": "Pipeline",\n'

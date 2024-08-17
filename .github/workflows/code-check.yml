@@ -32,6 +32,7 @@ jobs:
         run: |
           pipx install poetry
           poetry env use ${{ matrix.python-version }}
+          source .venv/bin/activate
           poetry lock [--no-update]
           poetry install
           # python -m pip install --upgrade pip

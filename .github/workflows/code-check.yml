@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: '${{ matrix.python-version }}'
 
-      - name: Install Poetry Action
+      - name: Install Poetry
         uses: snok/install-poetry@v1.4.1
         with:
           version: latest
@@ -42,7 +42,7 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies
+      - name: Install Dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           poetry env use ${{ matrix.python-version }}
@@ -51,11 +51,13 @@ jobs:
 
       - name: Lint with flake8
         run: |
+          source .venv/bin/activate
           # stop the build if there are Python syntax errors or undefined names
           python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics --inline-quotes=double
 
-      - name: Test with pytest
+      - name: Run Unit Tests with pytest
         run: |
+          source .venv/bin/activate
           pytest

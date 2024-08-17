@@ -105,8 +105,8 @@ function Activate_Venv {
 function Install_Requirements {
     try {
         Write_Banner "Install Requirements"
-        $arguments = "install -r requirements.txt"
-        Execute_Command "pip" $arguments
+        $arguments = "install"
+        Execute_Command "poetry" $arguments
     }
     catch {
         Write-Host "*** Installing Requirements Failed ***"

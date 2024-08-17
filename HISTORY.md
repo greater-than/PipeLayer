@@ -1,8 +1,13 @@
 # PipeLayer: Version History
 
-## 0.8.0 - 8/15/2024
+## 0.8.0 - 8/18/2024
 
-- Compatible with Python 3.12
+- Added support for Compatible with Python 3.12
+
+BREAKING CHANGES:
+- Dropped support for Python versions < 3.9
+- Adding events can no longer be done using concatenation operators. They can only be added using the `append` method
+  As convenient as it was, it was breaking Liskov's Substitution Principle
 
 ## 0.7.0 - 9/3/2021
 

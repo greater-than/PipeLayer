@@ -1,0 +1,52 @@
+{
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "python.analysis.extraPaths": [
+        "./src",
+        "./test",
+        "./examples/simple_pipelayer/src",
+        "./examples/pipelayer_microservice/src"
+    ],
+    "python.autoComplete.extraPaths": [
+        "./src",
+        "./test",
+        "./examples/simple_pipelayer/src",
+        "./examples/pipelayer_microservice/src"
+    ],
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.formatOnSave": true
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8",
+        "editor.formatOnSave": true,
+    },
+    "editor.formatOnSave": true,
+    "flake8.args": [
+        "--max-line-length",
+        "120",
+        "--inline-quotes",
+        "double",
+        "--exclude",
+        ".venv"
+    ],
+    "editor.semanticHighlighting.enabled": true,
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "cSpell.words": [
+        "autopep",
+        "endregion",
+        "greaterthan",
+        "isort",
+        "mypy",
+        "nosetests",
+        "pipelayer",
+        "pydantic",
+        "pytest",
+        "stringbender",
+        "venv"
+    ],
+}

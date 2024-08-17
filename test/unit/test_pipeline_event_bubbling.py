@@ -29,10 +29,10 @@ class TestPipelineEventBubbling:
             args.action = Action.CONTINUE
 
         first_filter = FirstFilter()
-        first_filter.start += first_filter_start
+        first_filter.start.append(first_filter_start)
 
         second_filter = SecondFilter()
-        second_filter.start += second_filter_start
+        second_filter.start.append(second_filter_start)
 
         bubbly_pipeline = Pipeline(
             name="Outer Pipeline",

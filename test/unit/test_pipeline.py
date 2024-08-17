@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from fixtures.app_context import AppContext
 from pipelayer import Filter, Pipeline
 from pipelayer.filter import raise_events
 
@@ -14,7 +15,7 @@ class TestPipeline:
         assert isinstance(Pipeline([]), ICompoundStep)
 
     @pytest.mark.happy
-    def test_pipeline_basic(self, app_context):
+    def test_pipeline_basic(self, app_context: AppContext):
 
         class FirstFilter(Filter):
             @raise_events
@@ -36,7 +37,7 @@ class TestPipeline:
         assert isinstance(m.__dict__, dict)
 
     @pytest.mark.happy
-    def test_nested_pipeline(self, app_context):
+    def test_nested_pipeline(self, app_context: AppContext):
         class FirstFilter(Filter):
             def run(self, data, context) -> dict:
                 return {"something": "goes here"}
@@ -56,7 +57,7 @@ class TestPipeline:
         assert isinstance(pipeline.manifest.__dict__, dict)
 
     @pytest.mark.happy
-    def test_pipeline_all_filter_types(self, app_context):
+    def test_pipeline_all_filter_types(self, app_context: AppContext):
 
         class FirstFilter(Filter):
             def run(self, data, context) -> dict:
@@ -127,7 +128,7 @@ class TestPipeline:
 
         class ExceptionFilter(Filter):
             def run(self, data, context) -> dict:
-                raise FileNotFoundError("This is not the file you're looing for.")
+                raise FileNotFoundError("This is not the file you're looking for.")
 
         steps = [ExceptionFilter]
         pipeline = Pipeline(steps)

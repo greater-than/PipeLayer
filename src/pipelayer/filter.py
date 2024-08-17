@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from functools import wraps
-from typing import Any, Callable, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, List, Optional, Tuple, cast
 
 from pipelayer.context import Context
 from pipelayer.enum import Action, State
@@ -14,16 +13,6 @@ from pipelayer.protocol import FilterEventHandlerT, IFilter
 class FilterEventHandlerList(List[FilterEventHandlerT]):
     def append(self, handler: FilterEventHandlerT) -> None:
         super().append(handler)
-
-    def __iadd__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> FilterEventHandlerList:
-        return FilterEventHandlerList(super().__iadd__(handlers if isinstance(handlers, Iterable) else [handlers]))
-
-    def __add__(self, handlers: Union[FilterEventHandlerT, Iterable[FilterEventHandlerT]]) -> FilterEventHandlerList:
-        return FilterEventHandlerList(super().__add__(
-            FilterEventHandlerList(handlers)
-            if isinstance(handlers, Iterable)
-            else FilterEventHandlerList([handlers])
-        ))
 
 
 class Filter(ABC):

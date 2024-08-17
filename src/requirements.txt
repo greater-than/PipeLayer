@@ -1,2 +1,0 @@
-pydantic~=1.8.1
-stringbender~=0.3.0

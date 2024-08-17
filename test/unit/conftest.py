@@ -12,4 +12,4 @@ def app_context() -> AppContext:
 
 @pytest.fixture
 def manifest() -> dict:
-    return Manifest.parse_obj(manifest_dict)
+    return Manifest.model_validate(manifest_dict)

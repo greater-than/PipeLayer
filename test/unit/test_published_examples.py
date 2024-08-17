@@ -26,7 +26,7 @@ class TestPublishedExamples:
             my_filter
         ])
 
-        my_pipeline.step_end += my_pipeline_step_end
+        my_pipeline.step_end.append(my_pipeline_step_end)
 
         output = my_pipeline.run("Data", None)
 
@@ -48,8 +48,7 @@ class TestPublishedExamples:
             pass
 
         my_pipeline = Pipeline([MyStep])
-        my_pipeline.start += my_pipeline_start
-
+        my_pipeline.start.append(my_pipeline_start)
         output = my_pipeline.run()
 
         assert output is None

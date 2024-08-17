@@ -16,22 +16,6 @@ class PipelineEventHandlerList(List[PipelineEventHandlerT]):
     def append(self, handler: PipelineEventHandlerT) -> None:
         super().append(handler)
 
-    def __iadd__(
-        self,
-        handlers: Union[PipelineEventHandlerT, Iterable[PipelineEventHandlerT]]
-    ) -> PipelineEventHandlerList:
-        return PipelineEventHandlerList(super().__iadd__(handlers if isinstance(handlers, Iterable) else [handlers]))
-
-    def __add__(
-        self,
-        handlers: Union[PipelineEventHandlerT, Iterable[PipelineEventHandlerT]]
-    ) -> PipelineEventHandlerList:
-        return PipelineEventHandlerList(super().__add__(
-            PipelineEventHandlerList(handlers)
-            if isinstance(handlers, Iterable)
-            else PipelineEventHandlerList([handlers])
-        ))
-
 
 class Pipeline(Filter):
     # region Constructors
@@ -44,7 +28,7 @@ class Pipeline(Filter):
         self.__manifest: Optional[Manifest] = None
         self.__exit_pipeline: bool = False
         self.__step_end: PipelineEventHandlerList = PipelineEventHandlerList()
-        self.exit += self._handle_exit
+        self.exit.append(self._handle_exit)
 
     def __init_subclass__(cls, **kwargs: Any):
         raise TypeError(f"type '{Pipeline.__name__}' is not an acceptable base type")
@@ -54,7 +38,7 @@ class Pipeline(Filter):
 
     @property
     def steps(self) -> Iterable[Union[IStep, PipelineCallableT]]:
-        return self.__steps
+        return cast(Iterable[Union[IStep, PipelineCallableT]], self.__steps)
 
     @property
     def manifest(self) -> Manifest:
@@ -69,7 +53,7 @@ class Pipeline(Filter):
     @step_end.setter
     def step_end(self, value: PipelineEventHandlerList) -> None:
         if not isinstance(value, PipelineEventHandlerList):
-            raise TypeError("Value must be an instance of FilterEventHandlerList")
+            raise TypeError("Value must be an instance of PipelineEventHandlerList")
         self.__step_end = value
 
     # endregion
@@ -94,7 +78,7 @@ class Pipeline(Filter):
             s_manifest = create_manifest(s_name, s_type)
 
             if isinstance(s, IFilter):
-                s.exit += self._handle_exit
+                s.exit.append(self._handle_exit)
 
                 if isinstance(s, ICompoundStep):
                     data, m_fest = s_func(data, context)

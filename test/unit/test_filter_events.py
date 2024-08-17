@@ -22,7 +22,7 @@ class TestFilterEvents:
 
         f = MyFilter()
 
-        f.start += myfilter_start
+        f.start.append(myfilter_start)
 
         p = Pipeline(steps=[f])
         response = p.run(None)
@@ -52,17 +52,9 @@ class TestFilterEvents:
             pass
 
         my_filter = MyFilter()
-        my_filter.start += my_event_handler
         my_filter.start.append(my_event_handler)
-        my_filter.start = my_filter.start + my_event_handler
-
-        my_filter.exit += my_event_handler
         my_filter.exit.append(my_event_handler)
-        my_filter.exit = my_filter.start + my_event_handler
-
-        my_filter.end += my_event_handler
         my_filter.end.append(my_event_handler)
-        my_filter.end = my_filter.start + my_event_handler
 
         assert True
 

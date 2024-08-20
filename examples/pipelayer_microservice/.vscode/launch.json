@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Debug Service",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "connexion",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "run",
+                "src/openapi.yaml",
+                "--port",
+                "8080"
+            ]
+        }
+    ]
+}

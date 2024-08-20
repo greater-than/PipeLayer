@@ -2,6 +2,7 @@ import pytest
 from fixtures.app_context import AppContext
 from pipelayer import Pipeline, PipelineEventArgs
 from pipelayer.filter import Filter
+from pipelayer.pipeline import PipelineEventHandlerList
 
 
 class MyFilter(Filter):
@@ -11,8 +12,25 @@ class MyFilter(Filter):
 
 @pytest.mark.unit
 class TestPipelineEvents:
+
     @pytest.mark.happy
-    def test_pipeline_on_step_end(self, ):
+    def test_pipeline_set_step_end_event_handlers(self):
+        def my_filter_step_end(sender: object, args: PipelineEventArgs) -> None:
+            assert args.data == {"something": "goes here"}
+            assert args.manifest_entry is not None
+            assert args.manifest_entry.end is not None
+            assert args.manifest_entry.duration is not None
+
+        f = MyFilter()
+        filters = PipelineEventHandlerList()
+        filters.append(my_filter_step_end)
+        p: Pipeline = Pipeline(steps=[f])
+        p.step_end = filters
+
+        p.run(None)
+
+    @pytest.mark.happy
+    def test_pipeline_on_step_end(self):
 
         def my_filter_step_end(sender: object, args: PipelineEventArgs) -> None:
             assert args.data == {"something": "goes here"}

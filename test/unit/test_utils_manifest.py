@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.unit
-class TestUtil:
+class TestManifestUtils:
 
     @pytest.mark.happy
     def test_render_manifest(self, manifest: dict):

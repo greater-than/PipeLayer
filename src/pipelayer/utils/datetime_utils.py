@@ -3,11 +3,7 @@ import sys
 
 
 def get_now_utc() -> d.datetime:
-    py_major = sys.version_info.major
-    py_minor = sys.version_info.minor
-    if py_major >= 3 and py_minor < 11:
-        return d.datetime.utcnow()
-    elif py_major >= 3 and py_minor >= 11:
+    if sys.version_info >= (3, 11):
         return d.datetime.now(d.UTC)  # type: ignore
-    else:
-        raise Exception("This version of Python is not supported.")
+    else:  # pragma: no cover
+        return d.datetime.utcnow()

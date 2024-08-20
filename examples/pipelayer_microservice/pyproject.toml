@@ -1,3 +1,35 @@
+[tool.poetry]
+name = "pipelayer-microservice"
+version = "0.1.0"
+description = "A microservice that implements the PipeLayer framework"
+authors = ["GreaterThan, LLC <info@greaterthan.solutions>"]
+license = "FreeBSD"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pydantic = "^2.8.2"
+flask = "^3.0.3"
+connexion = "^3.1.0"
+pipelayer = "^0.7.0"
+stringbender = "^0.3.0"
+requests = "^2.32.3"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.3.1"
+isort = "^5.13.2"
+flake8 = "^7.1.1"
+flake8-quotes = "^3.4.0"
+mypy = "^1.11.1"
+pre-commit = "^3.8.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+pytest-mock = "^3.14.0"
+coverage = "^7.6.1"
+pytest-cov = "^5.0.0"
+pytest-nunit = "^1.0.7"
+
 [tool.autopep8]
 max_line_length = 120
 ignore = "E501,W6"
@@ -23,3 +55,8 @@ markers = [
 [tool.coverage.report]
 fail_under = 10
 show_missing = true
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

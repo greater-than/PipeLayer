@@ -1,5 +1,0 @@
-flask
-connexion[swagger-ui]
-pipelayer
-stringbender
-requests

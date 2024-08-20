@@ -2,18 +2,18 @@ import pytest
 
 
 @pytest.mark.unit
-class TestUtil:
+class TestManifestUtils:
 
     @pytest.mark.happy
-    def test_render_manifest(self, manifest):
-        from pipelayer.util import render_manifest
+    def test_render_manifest(self, manifest: dict):
+        from pipelayer.utils.manifest_utils import render_manifest
 
         should_be = (
             '{\n  "name": "Pipeline",\n'
             '  "step_type": "Pipeline",\n'
-            '  "start": 1611261876.182439,\n'
-            '  "end": 1611261880.49989,\n'
-            '  "duration": "P0DT0H0M4.317451S",\n'
+            '  "start": "2021-01-21T20:44:36.182439Z",\n'
+            '  "end": "2021-01-21T20:44:40.499890Z",\n'
+            '  "duration": "PT4.317451S",\n'
             '  "steps": [\n    {\n'
             '      "name": "FirstFilter",\n'
             '      "step_type": "Filter",\n'

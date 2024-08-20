@@ -13,7 +13,7 @@ class _StepProxy:
     def __init__(self, func: PipelineCallableT) -> None:
         if not func or not is_callable_valid(cast(Callable, func)):
             raise InvalidFilterException(
-                "Step functions must have the same signataure as 'pipelayer.Step.run'"
+                "Step functions must have the same signature as 'pipelayer.Step.run'"
             )
         self.__func = func
         self.__name = ""
@@ -97,7 +97,7 @@ def is_class_func_static(class_type: type, func_name: str = "run") -> bool:
 
 
 def is_callable_valid(obj: Callable[..., Any]) -> bool:
-    if not obj or not inspect.isfunction(obj):
+    if not inspect.isfunction(obj):
         return False
     args = inspect.signature(obj).parameters
     return len(args) == 2

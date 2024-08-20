@@ -5,12 +5,12 @@ from stringbender import camel
 
 
 class DomainModelConfig:
-    allow_population_by_field_name: bool = True
+    populate_by_name: bool = True
     alias_generator: Callable = camel
 
 
 class DomainModel(BaseModel):
-    class Config(DomainModelConfig):
+    class ConfigDict(DomainModelConfig):
         pass
 
 

@@ -1,7 +1,7 @@
 from typing import Any
 
 from pipelayer import Manifest
-from pipelayer.util import render_manifest
+from pipelayer.utils.manifest_utils import render_manifest
 
 
 class Color:

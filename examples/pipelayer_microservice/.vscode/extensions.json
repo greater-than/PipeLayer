@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-python.flake8",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "editorconfig.editorconfig",
+        "ms-python.autopep8",
+        "tamasfe.even-better-toml"
+    ]
+}

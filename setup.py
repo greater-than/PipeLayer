@@ -38,8 +38,8 @@ def get_requirements() -> list:
 
 setup_args = {
     "name": "pipelayer",
-    "version": "0.7.0",
-    "description": "A lightweight pipeline framework",
+    "version": "0.8.0",
+    "description": "A lightweight, event-driven, pipeline framework",
     "long_description": get_long_description(),
     "long_description_content_type": "text/markdown",
     "url": "https://github.com/greater-than/PipeLayer",

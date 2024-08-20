@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pytest
 from pipelayer import Action, Context, Filter, FilterEventArgs, Pipeline
-from pipelayer.filter import _parse_filter_event_args, raise_events
+from pipelayer.filter import (FilterEventHandlerList, _parse_filter_event_args,
+                              raise_events)
 
 
 class MyFilter(Filter):
@@ -13,6 +14,53 @@ class MyFilter(Filter):
 
 @pytest.mark.unit
 class TestFilterEvents:
+    @pytest.mark.happy
+    def test_filter_set_start_event_handlers(self):
+
+        def myfilter_start(sender: object, args: FilterEventArgs) -> None:
+            args.action = Action.EXIT
+
+        f = MyFilter()
+        filters = FilterEventHandlerList()
+        filters.append(myfilter_start)
+        f.start = filters
+        p = Pipeline(steps=[f])
+
+        response = p.run(None)
+
+        assert response is None
+
+    @pytest.mark.happy
+    def test_filter_set_end_event_handlers(self):
+
+        def myfilter_start(sender: object, args: FilterEventArgs) -> None:
+            args.action = Action.EXIT
+
+        f = MyFilter()
+        filters = FilterEventHandlerList()
+        filters.append(myfilter_start)
+        f.end = filters
+        p = Pipeline(steps=[f])
+
+        response = p.run(None)
+
+        assert response == {"something": "goes here"}
+
+    @pytest.mark.happy
+    def test_filter_set_exit_event_handlers(self):
+
+        def myfilter_start(sender: object, args: FilterEventArgs) -> None:
+            args.action = Action.EXIT
+
+        f = MyFilter()
+        filters = FilterEventHandlerList()
+        filters.append(myfilter_start)
+        f.exit = filters
+        p = Pipeline(steps=[f])
+
+        response = p.run(None)
+
+        assert response == {"something": "goes here"}
 
     @pytest.mark.happy
     def test_filter_on_start(self):
@@ -22,7 +70,7 @@ class TestFilterEvents:
 
         f = MyFilter()
 
-        f.start += myfilter_start
+        f.start.append(myfilter_start)
 
         p = Pipeline(steps=[f])
         response = p.run(None)
@@ -52,17 +100,9 @@ class TestFilterEvents:
             pass
 
         my_filter = MyFilter()
-        my_filter.start += my_event_handler
         my_filter.start.append(my_event_handler)
-        my_filter.start = my_filter.start + my_event_handler
-
-        my_filter.exit += my_event_handler
         my_filter.exit.append(my_event_handler)
-        my_filter.exit = my_filter.start + my_event_handler
-
-        my_filter.end += my_event_handler
         my_filter.end.append(my_event_handler)
-        my_filter.end = my_filter.start + my_event_handler
 
         assert True
 

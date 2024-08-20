@@ -35,7 +35,7 @@ class Switch(Filter):
             Used by the Manifest. Defaults to "".
         """
         super().__init__(name or self.__class__.__name__)
-        self.__expression = expression
+        self.__expression: Union[IStep, PipelineCallableT] = expression
         self.__cases = cases
         self.__manifest: Optional[Manifest] = None
         self.default = uuid4().hex
@@ -48,11 +48,11 @@ class Switch(Filter):
 
     @property
     def expression(self) -> Union[IStep, PipelineCallableT]:
-        return self.__expression
+        return cast(Union[IStep, PipelineCallableT], self.__expression)
 
     @property
     def cases(self) -> Dict[Any, Union[IStep, PipelineCallableT]]:
-        return self.__cases
+        return cast(Dict[Any, Union[IStep, PipelineCallableT]], self.__cases)
 
     @property
     def manifest(self) -> Manifest:

@@ -10,9 +10,6 @@ dist
 .tools*
 .venv*
 
-# vscode
-.vscode
-
 # python
 .mypy_cache
 .pytest_cache

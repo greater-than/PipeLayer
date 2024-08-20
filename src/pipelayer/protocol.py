@@ -120,7 +120,7 @@ PipelineEventHandlerT = TypeVar("PipelineEventHandlerT", bound=Callable[[IPipeli
 class IFilterEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cover
 
     def append(self, handler: FilterEventHandlerT) -> None:
-        pass
+        return
 
     def __iadd__(
         self,
@@ -129,7 +129,7 @@ class IFilterEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cove
             Iterable[FilterEventHandlerT]
         ]
     ) -> IFilterEventHandlerList:
-        pass
+        return self
 
     def __add__(
         self,
@@ -138,13 +138,13 @@ class IFilterEventHandlerList(Iterable[FilterEventHandlerT]):  # pragma: no cove
             Iterable[FilterEventHandlerT]
         ]
     ) -> IFilterEventHandlerList:
-        pass
+        return self
 
 
 class IPipelineEventHandlerList(Iterable[PipelineEventHandlerT]):  # pragma: no cover
 
     def append(self, handler: PipelineEventHandlerT) -> None:
-        pass
+        return
 
     def __iadd__(
         self,
@@ -153,7 +153,7 @@ class IPipelineEventHandlerList(Iterable[PipelineEventHandlerT]):  # pragma: no 
             Iterable[PipelineEventHandlerT]
         ]
     ) -> IPipelineEventHandlerList:
-        pass
+        return self
 
     def __add__(
         self,
@@ -162,4 +162,4 @@ class IPipelineEventHandlerList(Iterable[PipelineEventHandlerT]):  # pragma: no 
             Iterable[PipelineEventHandlerT]
         ]
     ) -> IPipelineEventHandlerList:
-        pass
+        return self
